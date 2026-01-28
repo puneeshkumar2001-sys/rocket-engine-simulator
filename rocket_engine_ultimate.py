@@ -120,175 +120,422 @@ class AdvancedMaterialDatabase:
     }
 
 
-# ========== EXTENSIVE PROPELLANT DATABASE ==========
+# ========== COMPREHENSIVE PROPELLANT DATABASE ==========
 class AdvancedPropellantDatabase:
-    """Comprehensive propellant database with 20+ combinations"""
+    """Comprehensive propellant database with 21 combinations"""
 
-    PROPELLANTS = {
-        # KEROLOX Family
-        'RP-1/LOX': {
-            'type': 'Kerosene',
-            'optimal_of': 2.3,
-            'gamma_range': [1.18, 1.22, 1.26],
-            'c_star': 1800,
-            'combustion_temp': 3700,
-            'density_impulse': 3500,
-            'toxicity': 'Low',
-            'handling': 'Easy',
-            'cost': 'Low',
-            'flight_heritage': 'Extensive'
-        },
-        'Methane/LOX (CH4/LOX)': {
-            'type': 'Methane',
-            'optimal_of': 3.5,
-            'gamma_range': [1.20, 1.25, 1.30],
-            'c_star': 1900,
-            'combustion_temp': 3600,
-            'density_impulse': 3200,
-            'toxicity': 'Very Low',
-            'handling': 'Medium',
-            'cost': 'Low',
-            'flight_heritage': 'Modern'
-        },
-        'Propane/LOX': {
-            'type': 'Hydrocarbon',
-            'optimal_of': 3.0,
-            'gamma_range': [1.19, 1.23, 1.27],
-            'c_star': 1750,
-            'combustion_temp': 3650,
-            'density_impulse': 3400,
-            'toxicity': 'Low',
-            'handling': 'Easy',
-            'cost': 'Low',
-            'flight_heritage': 'Moderate'
-        },
+    def __init__(self):
+        self.PROPELLANTS = {
+            # LIQUID PROPELLANTS (13)
+            'RP-1/LOX': {
+                'type': 'Kerosene',
+                'optimal_of': 2.3,
+                'gamma_range': [1.18, 1.22, 1.26],
+                'c_star': 1800,
+                'combustion_temp': 3700,
+                'density_impulse': 3500,
+                'toxicity': 'Low',
+                'handling': 'Easy',
+                'cost': 'Low',
+                'flight_heritage': 'Extensive'
+            },
+            'Methane/LOX (CH4/LOX)': {
+                'type': 'Methane',
+                'optimal_of': 3.5,
+                'gamma_range': [1.20, 1.25, 1.30],
+                'c_star': 1900,
+                'combustion_temp': 3600,
+                'density_impulse': 3200,
+                'toxicity': 'Very Low',
+                'handling': 'Medium',
+                'cost': 'Low',
+                'flight_heritage': 'Modern'
+            },
+            'Propane/LOX': {
+                'type': 'Hydrocarbon',
+                'optimal_of': 3.0,
+                'gamma_range': [1.19, 1.23, 1.27],
+                'c_star': 1750,
+                'combustion_temp': 3650,
+                'density_impulse': 3400,
+                'toxicity': 'Low',
+                'handling': 'Easy',
+                'cost': 'Low',
+                'flight_heritage': 'Moderate'
+            },
+            'LH2/LOX': {
+                'type': 'Hydrogen',
+                'optimal_of': 6.0,
+                'gamma_range': [1.12, 1.15, 1.18],
+                'c_star': 2300,
+                'combustion_temp': 3500,
+                'density_impulse': 2500,
+                'toxicity': 'None',
+                'handling': 'Difficult',
+                'cost': 'High',
+                'flight_heritage': 'Extensive'
+            },
+            'Slush Hydrogen/LOX': {
+                'type': 'Hydrogen',
+                'optimal_of': 6.0,
+                'gamma_range': [1.10, 1.13, 1.16],
+                'c_star': 2350,
+                'combustion_temp': 3450,
+                'density_impulse': 2600,
+                'toxicity': 'None',
+                'handling': 'Very Difficult',
+                'cost': 'Very High',
+                'flight_heritage': 'Experimental'
+            },
+            'MMH/NTO': {
+                'type': 'Hypergolic',
+                'optimal_of': 1.65,
+                'gamma_range': [1.20, 1.24, 1.28],
+                'c_star': 1740,
+                'combustion_temp': 3400,
+                'density_impulse': 3300,
+                'toxicity': 'Very High',
+                'handling': 'Difficult',
+                'cost': 'High',
+                'flight_heritage': 'Extensive'
+            },
+            'UDMH/NTO': {
+                'type': 'Hypergolic',
+                'optimal_of': 2.0,
+                'gamma_range': [1.21, 1.25, 1.29],
+                'c_star': 1720,
+                'combustion_temp': 3450,
+                'density_impulse': 3350,
+                'toxicity': 'Very High',
+                'handling': 'Difficult',
+                'cost': 'High',
+                'flight_heritage': 'Extensive'
+            },
+            'Aerozine-50/NTO': {
+                'type': 'Hypergolic',
+                'optimal_of': 1.9,
+                'gamma_range': [1.20, 1.24, 1.28],
+                'c_star': 1760,
+                'combustion_temp': 3420,
+                'density_impulse': 3400,
+                'toxicity': 'High',
+                'handling': 'Difficult',
+                'cost': 'High',
+                'flight_heritage': 'Historical'
+            },
+            'H2O2/Kerosene': {
+                'type': 'Green',
+                'optimal_of': 7.0,
+                'gamma_range': [1.18, 1.22, 1.26],
+                'c_star': 1600,
+                'combustion_temp': 2800,
+                'density_impulse': 3000,
+                'toxicity': 'Low',
+                'handling': 'Medium',
+                'cost': 'Medium',
+                'flight_heritage': 'Limited'
+            },
+            'LNG/LOX': {
+                'type': 'Methane',
+                'optimal_of': 3.4,
+                'gamma_range': [1.19, 1.24, 1.29],
+                'c_star': 1850,
+                'combustion_temp': 3550,
+                'density_impulse': 3150,
+                'toxicity': 'Very Low',
+                'handling': 'Medium',
+                'cost': 'Low',
+                'flight_heritage': 'Modern'
+            },
+            'Aluminum/Ice (ALICE)': {
+                'type': 'Experimental',
+                'optimal_of': 1.2,
+                'gamma_range': [1.15, 1.18, 1.21],
+                'c_star': 1400,
+                'combustion_temp': 3200,
+                'density_impulse': 2800,
+                'toxicity': 'Medium',
+                'handling': 'Difficult',
+                'cost': 'Medium',
+                'flight_heritage': 'Experimental'
+            },
+            'Hydrogen Peroxide (98%)': {
+                'type': 'Monopropellant',
+                'optimal_of': 0.0,
+                'gamma_range': [1.13, 1.13, 1.13],
+                'c_star': 1200,
+                'combustion_temp': 1100,
+                'density_impulse': 1500,
+                'toxicity': 'Medium',
+                'handling': 'Difficult',
+                'cost': 'Medium',
+                'flight_heritage': 'Historical'
+            },
+            'Hydrazine (N2H4)': {
+                'type': 'Monopropellant',
+                'optimal_of': 0.0,
+                'gamma_range': [1.20, 1.20, 1.20],
+                'c_star': 1300,
+                'combustion_temp': 1200,
+                'density_impulse': 2200,
+                'toxicity': 'Very High',
+                'handling': 'Very Difficult',
+                'cost': 'High',
+                'flight_heritage': 'Extensive'
+            },
 
-        # HYDROLOX Family
-        'LH2/LOX': {
-            'type': 'Hydrogen',
-            'optimal_of': 6.0,
-            'gamma_range': [1.12, 1.15, 1.18],
-            'c_star': 2300,
-            'combustion_temp': 3500,
-            'density_impulse': 2500,
-            'toxicity': 'None',
-            'handling': 'Difficult',
+            # SOLID PROPELLANTS (4)
+            'HTPB/AP (Solid)': {
+                'type': 'Solid',
+                'optimal_of': 0.0,
+                'gamma_range': [1.18, 1.22, 1.26],
+                'c_star': 1580,
+                'combustion_temp': 3400,
+                'density_impulse': 2800,
+                'toxicity': 'Medium',
+                'handling': 'Medium',
+                'cost': 'Low',
+                'flight_heritage': 'Extensive',
+                'burn_rate': 8.0,
+                'pressure_exp': 0.3,
+                'density': 1800
+            },
+            'PBAN/AP (Solid)': {
+                'type': 'Solid',
+                'optimal_of': 0.0,
+                'gamma_range': [1.19, 1.23, 1.27],
+                'c_star': 1600,
+                'combustion_temp': 3450,
+                'density_impulse': 2850,
+                'toxicity': 'Medium',
+                'handling': 'Medium',
+                'cost': 'Low',
+                'flight_heritage': 'Extensive',
+                'burn_rate': 7.5,
+                'pressure_exp': 0.32,
+                'density': 1750
+            },
+            'Double-Base (Solid)': {
+                'type': 'Solid',
+                'optimal_of': 0.0,
+                'gamma_range': [1.17, 1.21, 1.25],
+                'c_star': 1550,
+                'combustion_temp': 3300,
+                'density_impulse': 2700,
+                'toxicity': 'Medium',
+                'handling': 'Difficult',
+                'cost': 'Medium',
+                'flight_heritage': 'Extensive',
+                'burn_rate': 10.0,
+                'pressure_exp': 0.25,
+                'density': 1600
+            },
+            'APCP (Solid)': {
+                'type': 'Solid',
+                'optimal_of': 0.0,
+                'gamma_range': [1.20, 1.24, 1.28],
+                'c_star': 1620,
+                'combustion_temp': 3500,
+                'density_impulse': 2900,
+                'toxicity': 'Medium',
+                'handling': 'Medium',
+                'cost': 'Medium',
+                'flight_heritage': 'Extensive',
+                'burn_rate': 9.0,
+                'pressure_exp': 0.35,
+                'density': 1850
+            },
+
+            # HYBRID PROPELLANTS (4)
+            'HTPB/N2O (Hybrid)': {
+                'type': 'Hybrid',
+                'optimal_of': 7.5,
+                'gamma_range': [1.16, 1.19, 1.22],
+                'c_star': 1450,
+                'combustion_temp': 3200,
+                'density_impulse': 2600,
+                'toxicity': 'Low',
+                'handling': 'Easy',
+                'cost': 'Low',
+                'flight_heritage': 'Moderate',
+                'regression_rate': 1.2,
+                'regression_exp': 0.8,
+                'fuel_density': 920
+            },
+            'HTPB/LOX (Hybrid)': {
+                'type': 'Hybrid',
+                'optimal_of': 2.4,
+                'gamma_range': [1.18, 1.22, 1.26],
+                'c_star': 1700,
+                'combustion_temp': 3600,
+                'density_impulse': 3100,
+                'toxicity': 'Low',
+                'handling': 'Medium',
+                'cost': 'Low',
+                'flight_heritage': 'Experimental',
+                'regression_rate': 0.8,
+                'regression_exp': 0.7,
+                'fuel_density': 920
+            },
+            'Paraffin/N2O (Hybrid)': {
+                'type': 'Hybrid',
+                'optimal_of': 8.0,
+                'gamma_range': [1.15, 1.18, 1.21],
+                'c_star': 1480,
+                'combustion_temp': 3100,
+                'density_impulse': 2650,
+                'toxicity': 'Very Low',
+                'handling': 'Easy',
+                'cost': 'Very Low',
+                'flight_heritage': 'Research',
+                'regression_rate': 2.5,
+                'regression_exp': 0.8,
+                'fuel_density': 900
+            },
+            'PE/LOX (Hybrid)': {
+                'type': 'Hybrid',
+                'optimal_of': 2.6,
+                'gamma_range': [1.17, 1.21, 1.25],
+                'c_star': 1680,
+                'combustion_temp': 3550,
+                'density_impulse': 3050,
+                'toxicity': 'Very Low',
+                'handling': 'Easy',
+                'cost': 'Very Low',
+                'flight_heritage': 'Research',
+                'regression_rate': 0.7,
+                'regression_exp': 0.65,
+                'fuel_density': 950
+            }
+        }
+
+
+# ========== ENGINE CYCLE DATABASE ==========
+class EngineCycleDatabase:
+    """Complete engine cycle configurations"""
+    
+    CYCLES = {
+        'Gas Generator': {
+            'description': 'Open cycle using separate gas generator for turbopumps',
+            'efficiency': 0.92,
+            'complexity': 'Medium',
+            'cost': 'Medium',
+            'reliability': 'High',
+            'throttle_range': '70-105%',
+            'examples': 'F-1, Merlin, Vulcain',
+            'advantages': ['Simple plumbing', 'Proven reliability', 'Good throttle response'],
+            'disadvantages': ['Lower efficiency (fuel-rich tap-off)', 'Loss of propellant mass flow', 'Separate combustion chamber required']
+        },
+        'Staged Combustion (Fuel-rich)': {
+            'description': 'Closed cycle where all propellants go through pre-burner',
+            'efficiency': 0.96,
+            'complexity': 'High',
             'cost': 'High',
-            'flight_heritage': 'Extensive'
+            'reliability': 'Medium',
+            'throttle_range': '50-110%',
+            'examples': 'RD-180, SSME, BE-4',
+            'advantages': ['Highest efficiency', 'All propellants utilized', 'Excellent chamber pressure'],
+            'disadvantages': ['Very complex plumbing', 'High pressure requirements', 'Material challenges']
         },
-        'Slush Hydrogen/LOX': {
-            'type': 'Hydrogen',
-            'optimal_of': 6.0,
-            'gamma_range': [1.10, 1.13, 1.16],
-            'c_star': 2350,
-            'combustion_temp': 3450,
-            'density_impulse': 2600,
-            'toxicity': 'None',
-            'handling': 'Very Difficult',
+        'Staged Combustion (Oxidizer-rich)': {
+            'description': 'Closed cycle with oxidizer-rich pre-burner',
+            'efficiency': 0.95,
+            'complexity': 'Very High',
             'cost': 'Very High',
-            'flight_heritage': 'Experimental'
+            'reliability': 'Medium',
+            'throttle_range': '40-100%',
+            'examples': 'RD-170, NK-33, Raptor',
+            'advantages': ['High efficiency', 'Avoids fuel-rich hot gas turbine issues', 'Excellent power density'],
+            'disadvantages': ['Extreme material requirements', 'Corrosion challenges', 'Very high development cost']
         },
-
-        # HYPERGOLIC Family
-        'MMH/NTO': {
-            'type': 'Hypergolic',
-            'optimal_of': 1.65,
-            'gamma_range': [1.20, 1.24, 1.28],
-            'c_star': 1740,
-            'combustion_temp': 3400,
-            'density_impulse': 3300,
-            'toxicity': 'Very High',
-            'handling': 'Difficult',
+        'Expander Cycle': {
+            'description': 'Uses fuel as coolant then expands through turbine',
+            'efficiency': 0.94,
+            'complexity': 'Medium-High',
             'cost': 'High',
-            'flight_heritage': 'Extensive'
+            'reliability': 'High',
+            'throttle_range': '30-110%',
+            'examples': 'RL-10, LE-5, Vinci',
+            'advantages': ['Simple cycle with no gas generator', 'Excellent throttleability', 'High reliability'],
+            'disadvantages': ['Limited to high-heat-capacity fuels (H2)', 'Limited chamber pressure', 'Cooling channel complexity']
         },
-        'UDMH/NTO': {
-            'type': 'Hypergolic',
-            'optimal_of': 2.0,
-            'gamma_range': [1.21, 1.25, 1.29],
-            'c_star': 1720,
-            'combustion_temp': 3450,
-            'density_impulse': 3350,
-            'toxicity': 'Very High',
-            'handling': 'Difficult',
-            'cost': 'High',
-            'flight_heritage': 'Extensive'
-        },
-        'Aerozine-50/NTO': {
-            'type': 'Hypergolic',
-            'optimal_of': 1.9,
-            'gamma_range': [1.20, 1.24, 1.28],
-            'c_star': 1760,
-            'combustion_temp': 3420,
-            'density_impulse': 3400,
-            'toxicity': 'High',
-            'handling': 'Difficult',
-            'cost': 'High',
-            'flight_heritage': 'Historical'
-        },
-
-        # GREEN PROPELLANTS
-        'H2O2/Kerosene': {
-            'type': 'Green',
-            'optimal_of': 7.0,
-            'gamma_range': [1.18, 1.22, 1.26],
-            'c_star': 1600,
-            'combustion_temp': 2800,
-            'density_impulse': 3000,
-            'toxicity': 'Low',
-            'handling': 'Medium',
-            'cost': 'Medium',
-            'flight_heritage': 'Limited'
-        },
-        'LNG/LOX': {
-            'type': 'Methane',
-            'optimal_of': 3.4,
-            'gamma_range': [1.19, 1.24, 1.29],
-            'c_star': 1850,
-            'combustion_temp': 3550,
-            'density_impulse': 3150,
-            'toxicity': 'Very Low',
-            'handling': 'Medium',
+        'Pressure Fed': {
+            'description': 'Simplest cycle using tank pressure for propellant feed',
+            'efficiency': 0.85,
+            'complexity': 'Low',
             'cost': 'Low',
-            'flight_heritage': 'Modern'
+            'reliability': 'Very High',
+            'throttle_range': '20-100%',
+            'examples': 'AJ-10, R-4D, SuperDraco',
+            'advantages': ['Extreme simplicity', 'High reliability', 'Excellent restart capability'],
+            'disadvantages': ['Very low chamber pressure', 'Heavy tank structure', 'Limited to small engines']
         },
+        'Electric Pump Fed': {
+            'description': 'Modern cycle using electric motors for turbopumps',
+            'efficiency': 0.93,
+            'complexity': 'Medium',
+            'cost': 'Medium',
+            'reliability': 'Medium',
+            'throttle_range': '10-100%',
+            'examples': 'Rutherford, Curie',
+            'advantages': ['Precise mixture control', 'Deep throttle capability', 'Reduced plumbing complexity'],
+            'disadvantages': ['Battery mass penalty', 'Limited to medium-sized engines', 'Thermal management challenges']
+        }
+    }
 
-        # ADVANCED/EXPERIMENTAL
-        'Aluminum/Ice (ALICE)': {
-            'type': 'Experimental',
-            'optimal_of': 1.2,
-            'gamma_range': [1.15, 1.18, 1.21],
-            'c_star': 1400,
-            'combustion_temp': 3200,
-            'density_impulse': 2800,
-            'toxicity': 'Medium',
-            'handling': 'Difficult',
-            'cost': 'Medium',
-            'flight_heritage': 'Experimental'
+
+# ========== NOZZLE DESIGN DATABASE ==========
+class NozzleDesignDatabase:
+    """Advanced nozzle configurations and performance"""
+    
+    NOZZLE_TYPES = {
+        'Conical (15°)': {
+            'divergence_efficiency': 0.96,
+            'manufacturing_cost': 'Low',
+            'length_factor': 1.0,
+            'weight_factor': 1.0,
+            'cooling_complexity': 'Low',
+            'application': 'Small engines, upper stages'
         },
-        'Hydrogen Peroxide (98%)': {
-            'type': 'Monopropellant',
-            'optimal_of': 0.0,
-            'gamma_range': [1.13, 1.13, 1.13],
-            'c_star': 1200,
-            'combustion_temp': 1100,
-            'density_impulse': 1500,
-            'toxicity': 'Medium',
-            'handling': 'Difficult',
-            'cost': 'Medium',
-            'flight_heritage': 'Historical'
+        'Bell (NASA-SP)': {
+            'divergence_efficiency': 0.98,
+            'manufacturing_cost': 'Medium',
+            'length_factor': 0.8,
+            'weight_factor': 0.9,
+            'cooling_complexity': 'Medium',
+            'application': 'Medium engines, balance perf/length'
         },
-        'Hydrazine (N2H4)': {
-            'type': 'Monopropellant',
-            'optimal_of': 0.0,
-            'gamma_range': [1.20, 1.20, 1.20],
-            'c_star': 1300,
-            'combustion_temp': 1200,
-            'density_impulse': 2200,
-            'toxicity': 'Very High',
-            'handling': 'Very Difficult',
-            'cost': 'High',
-            'flight_heritage': 'Extensive'
+        'Aerospike (Linear)': {
+            'divergence_efficiency': 0.99,
+            'manufacturing_cost': 'Very High',
+            'length_factor': 0.6,
+            'weight_factor': 1.2,
+            'cooling_complexity': 'Very High',
+            'application': 'Altitude compensation, SSTO'
+        },
+        'Aerospike (Annular)': {
+            'divergence_efficiency': 0.99,
+            'manufacturing_cost': 'Extremely High',
+            'length_factor': 0.5,
+            'weight_factor': 1.3,
+            'cooling_complexity': 'Extremely High',
+            'application': 'Advanced SSTO, spaceplanes'
+        },
+        'Dual-Bell': {
+            'divergence_efficiency': 0.97,
+            'manufacturing_cost': 'High',
+            'length_factor': 1.1,
+            'weight_factor': 1.1,
+            'cooling_complexity': 'High',
+            'application': 'Two-stage-to-orbit optimization'
+        },
+        'Expansion-Deflection': {
+            'divergence_efficiency': 0.96,
+            'manufacturing_cost': 'High',
+            'length_factor': 0.9,
+            'weight_factor': 1.1,
+            'cooling_complexity': 'Medium',
+            'application': 'Compact installations'
         }
     }
 
@@ -300,6 +547,8 @@ class PhysicsEngineWithExplanation:
     def __init__(self):
         self.materials = AdvancedMaterialDatabase()
         self.propellants = AdvancedPropellantDatabase()
+        self.cycles = EngineCycleDatabase()
+        self.nozzles = NozzleDesignDatabase()
 
     def calculate_gamma(self, propellant, of_ratio):
         """Calculate specific heat ratio with interpolation"""
@@ -334,29 +583,39 @@ class PhysicsEngineWithExplanation:
         """Calculate combustion efficiency with physics-based model"""
         props = self.propellants.PROPELLANTS[propellant]
 
-        # Base efficiency
-        if propellant in ['LH2/LOX', 'Slush Hydrogen/LOX']:
+        # Base efficiency by propellant type
+        if 'Solid' in props['type']:
+            base_eff = 0.99  # Solids have excellent combustion efficiency
+        elif 'Hybrid' in props['type']:
+            base_eff = 0.96  # Hybrids have mixing challenges
+        elif propellant in ['LH2/LOX', 'Slush Hydrogen/LOX']:
             base_eff = 0.985
         elif 'Hypergolic' in props['type']:
-            base_eff = 0.99  # Hypergolics have excellent mixing
+            base_eff = 0.99
         else:
             base_eff = 0.98
 
-        # OF ratio effect
-        of_deviation = abs(of_ratio - props['optimal_of']) / props['optimal_of']
-        of_factor = 1.0 - 0.03 * of_deviation ** 1.5
+        # OF ratio effect (not for solids)
+        if 'Solid' not in props['type']:
+            of_deviation = abs(of_ratio - props['optimal_of']) / props['optimal_of']
+            of_factor = 1.0 - 0.03 * of_deviation ** 1.5
+        else:
+            of_factor = 1.0  # Solids have fixed composition
 
         # Pressure effect (higher pressure = better mixing)
         pressure_factor = 1.0 + 0.001 * (Pc - 20.0)
 
-        # Injector type effect
-        injector_factors = {
-            'coaxial': 1.00,
-            'like-on-like': 0.98,
-            'impinging': 0.97,
-            'swirl': 0.96
-        }
-        injector_factor = injector_factors.get(injector_type, 0.97)
+        # Injector type effect (not for solids)
+        if 'Solid' in props['type']:
+            injector_factor = 1.0
+        else:
+            injector_factors = {
+                'coaxial': 1.00,
+                'like-on-like': 0.98,
+                'impinging': 0.97,
+                'swirl': 0.96
+            }
+            injector_factor = injector_factors.get(injector_type, 0.97)
 
         # Chamber L* effect (longer = more complete combustion)
         Lstar_factor = 1.0  # Simplified
@@ -422,7 +681,7 @@ class PhysicsEngineWithExplanation:
         explanations = {
             'thrust': self._explain_thrust_difference,
             'isp': self._explain_isp_difference,
-            'pressure': self._explain_pressure_difference,    # ← THIS LINE IS THE PROBLEM
+            'pressure': self._explain_pressure_difference,
             'temperature': self._explain_temperature_difference,
             'efficiency': self._explain_efficiency_difference
         }
@@ -789,6 +1048,40 @@ class PhysicsEngineWithExplanation:
             ]
         }
 
+    def calculate_solid_burn_rate(self, propellant, Pc):
+        """Calculate solid propellant burn rate using Vieille's law"""
+        props = self.propellants.PROPELLANTS[propellant]
+
+        if 'Solid' not in props['type']:
+            return 0.0
+
+        # r = a * Pc^n
+        a = props['burn_rate'] / (70.0 ** props['pressure_exp'])  # Reference at 70 bar
+        n = props['pressure_exp']
+
+        burn_rate = a * (Pc ** n)  # mm/s
+
+        # Temperature sensitivity (typical 0.2%/K)
+        temp_factor = 1.0  # Simplified
+
+        return burn_rate * temp_factor
+
+    def calculate_hybrid_regression_rate(self, propellant, oxidizer_flux, Pc):
+        """Calculate hybrid fuel regression rate using Marxman equation"""
+        props = self.propellants.PROPELLANTS[propellant]
+
+        if 'Hybrid' not in props['type']:
+            return 0.0
+
+        # r = a * Gox^m * Pc^n (simplified)
+        a = props['regression_rate'] / (200.0 ** props['regression_exp'])  # Reference
+        m = props['regression_exp']
+        n = 0.0  # Pressure exponent for hybrids (usually small)
+
+        regression_rate = a * (oxidizer_flux ** m) * (Pc ** n)  # mm/s
+
+        return regression_rate
+    
     def get_overall_assessment(self, deviations):
         """Get overall engine assessment"""
         avg_dev = np.mean([abs(d) for d in deviations.values()])
@@ -825,8 +1118,6 @@ class PhysicsEngineWithExplanation:
                 "summary": "Large discrepancies between theoretical and experimental values.",
                 "action": "Major redesign or parameter adjustment needed"
             }
-
-
 
 
 # ========== ACOUSTIC ANALYSIS ENGINE ==========
@@ -1132,6 +1423,7 @@ class Visualization3D:
 
         return fig
 
+
 # ========== COMPREHENSIVE PDF REPORT GENERATOR ==========
 class ComprehensivePDFReport:
     """Generate comprehensive PDF report with all details"""
@@ -1256,6 +1548,8 @@ class UltimateRocketEngine:
         self.physics = PhysicsEngineWithExplanation()
         self.acoustics = AcousticAnalysisEngine()
         self.visualization = Visualization3D()
+        self.cycles = EngineCycleDatabase()
+        self.nozzles = NozzleDesignDatabase()
 
         self.time = np.linspace(0, params['burn_time'], 1000)
         np.random.seed(42)
@@ -1317,6 +1611,30 @@ class UltimateRocketEngine:
         self.acoustic_results = self.acoustics.analyze_acoustic_modes(
             self.params['Pc'], self.Lc, self.Dc, self.params['propellant']
         )
+        # Adjust for solid/hybrid propellants
+        is_solid = 'Solid' in prop['type']
+        is_hybrid = 'Hybrid' in prop['type']
+
+        if is_solid:
+            # Solid propellant has no separate fuel/oxidizer flow
+            self.mdot_theoretical *= 0.95  # Slightly lower mass flow for solids
+            # Solids typically have slightly lower ISP than theoretical liquids
+            self.Isp_theoretical *= 0.92
+            # Calculate burn rate
+            self.burn_rate = self.physics.calculate_solid_burn_rate(
+                self.params['propellant'],
+                self.params['Pc']
+            )
+
+        elif is_hybrid:
+            # Hybrids have intermediate performance
+            self.Isp_theoretical *= 0.94
+            # Add regression rate calculation
+            self.regression_rate = self.physics.calculate_hybrid_regression_rate(
+                self.params['propellant'],
+                200.0,  # Estimated oxidizer flux
+                self.params['Pc']
+            )
 
     def generate_experimental_data(self):
         """Generate realistic experimental data with all physics effects"""
@@ -1409,6 +1727,67 @@ class UltimateRocketEngine:
                 theoretical, experimental, param, self.params
             )
 
+    def analyze_engine_cycle(self):
+        """Analyze selected engine cycle performance"""
+        cycle_name = self.params.get('cycle', 'Gas Generator')
+        cycle = self.cycles.CYCLES[cycle_name]
+        
+        return {
+            'cycle_name': cycle_name,
+            'efficiency': cycle['efficiency'],
+            'description': cycle['description'],
+            'complexity': cycle['complexity'],
+            'throttle_range': cycle['throttle_range'],
+            'examples': cycle['examples']
+        }
+    
+    def analyze_nozzle_performance(self):
+        """Analyze nozzle type performance"""
+        nozzle_type = self.params.get('nozzle_type', 'Bell (NASA-SP)')
+        nozzle = self.nozzles.NOZZLE_TYPES[nozzle_type]
+        
+        return {
+            'nozzle_type': nozzle_type,
+            'divergence_efficiency': nozzle['divergence_efficiency'] * 100,
+            'length_factor': nozzle['length_factor'],
+            'manufacturing_cost': nozzle['manufacturing_cost'],
+            'application': nozzle['application'],
+            'cooling_complexity': nozzle['cooling_complexity']
+        }
+    
+    def analyze_propellant_type(self):
+        """Analyze propellant-specific characteristics"""
+        propellant = self.params['propellant']
+        props = self.physics.propellants.PROPELLANTS[propellant]
+        
+        analysis = {
+            'propellant_name': propellant,
+            'type': props['type'],
+            'optimal_of_ratio': props.get('optimal_of', 0.0),
+            'characteristic_velocity': props.get('c_star', 1600),
+            'toxicity': props.get('toxicity', 'Medium'),
+            'handling': props.get('handling', 'Medium'),
+            'flight_heritage': props.get('flight_heritage', 'Moderate')
+        }
+        
+        # Solid-specific analysis
+        if 'Solid' in props['type']:
+            burn_rate = self.physics.calculate_solid_burn_rate(propellant, self.params['Pc'])
+            analysis.update({
+                'burn_rate': burn_rate,
+                'propellant_density': props.get('density', 1800)
+            })
+        
+        # Hybrid-specific analysis
+        elif 'Hybrid' in props['type']:
+            regression_rate = self.physics.calculate_hybrid_regression_rate(propellant, 200.0, self.params['Pc'])
+            analysis.update({
+                'regression_rate': regression_rate,
+                'fuel_density': props.get('fuel_density', 900)
+            })
+        
+        return analysis
+
     def get_comprehensive_results(self):
         """Get all results in structured format"""
         return {
@@ -1427,6 +1806,13 @@ class UltimateRocketEngine:
                 'Erosion Rate': f'{self.erosion_rate * 1000:.3f} mm/s',
                 'Estimated Heat Flux': '5-10 MW/m²',
                 'Cooling Requirement': 'Active regenerative'
+            },
+            'solid_hybrid_info': {
+                'Burn/Regression Rate': f'{getattr(self, "burn_rate", getattr(self, "regression_rate", 0)):.2f} mm/s',
+                'Propellant Type': self.physics.propellants.PROPELLANTS[self.params['propellant']]['type'],
+                'Notes': 'Solid motor' if 'Solid' in self.physics.propellants.PROPELLANTS[self.params['propellant']]['type'] else
+                'Hybrid engine' if 'Hybrid' in self.physics.propellants.PROPELLANTS[self.params['propellant']]['type'] else
+                'Liquid engine'
             },
             'structural': {
                 'Throat Diameter': f'{self.Dt * 1000:.1f} mm',
@@ -1459,11 +1845,42 @@ if 'pdf_data' not in st.session_state:
 # ========== SIDEBAR ==========
 with st.sidebar:
     st.title("⚙️ ENGINE PARAMETERS")
-
+    
+    # Create propellant database instance
+    prop_db = AdvancedPropellantDatabase()
+    
+    # Get all propellant names
+    all_propellants = list(prop_db.PROPELLANTS.keys())
+    
     # Propellant selection
-    propellants = list(AdvancedPropellantDatabase().PROPELLANTS.keys())
-    propellant = st.selectbox("Propellant Combination", propellants, index=0)
-
+    propellant = st.selectbox(
+        "Propellant Combination",
+        all_propellants,
+        index=0,
+        help="Select from 21 propellant combinations"
+    )
+    
+    # Show which propellant was selected
+    st.sidebar.success(f"✅ Selected: **{propellant}**")
+    
+    # Engine Cycle Selection
+    cycles_list = list(EngineCycleDatabase().CYCLES.keys())
+    selected_cycle = st.selectbox(
+        "Engine Cycle",
+        cycles_list,
+        index=0,
+        help="Select the engine cycle configuration"
+    )
+    
+    # Nozzle Type Selection
+    nozzles_list = list(NozzleDesignDatabase().NOZZLE_TYPES.keys())
+    selected_nozzle = st.selectbox(
+        "Nozzle Type",
+        nozzles_list,
+        index=1,
+        help="Select nozzle design type"
+    )
+    
     # Material selection
     materials = list(AdvancedMaterialDatabase().MATERIALS.keys())
     material = st.selectbox("Throat/Chamber Material", materials, index=0)
@@ -1493,10 +1910,11 @@ with st.sidebar:
             'propellant': propellant,
             'expansion_ratio': expansion,
             'material': material,
-            'injector_type': 'coaxial'
+            'injector_type': 'coaxial',
+            'cycle': selected_cycle,
+            'nozzle_type': selected_nozzle
         }
         st.session_state.engine = UltimateRocketEngine(params)
-        # ADD THIS LINE to clear old PDF when new analysis runs
         st.session_state.pdf_data = None
         st.rerun()
 
@@ -1517,46 +1935,9 @@ with st.sidebar:
                     engine.explanations
                 )
 
-                # PDF Download Button
-                if st.button("📄 GENERATE & DOWNLOAD PDF", type="primary", use_container_width=True):
-                    if st.session_state.engine:
-                        with st.spinner("📊 Generating PDF report..."):
-                            engine = st.session_state.engine
-                            results = engine.get_comprehensive_results()
+                # Store in session state
+                st.session_state.pdf_data = pdf_data
 
-                            pdf_gen = ComprehensivePDFReport()
-                            pdf_data = pdf_gen.create_report(
-                                engine.params,
-                                results,
-                                engine.explanations
-                            )
-
-                            # Store in session state
-                            st.session_state.pdf_data = pdf_data
-
-                            # Show download button
-                            st.download_button(
-                                label="⬇️ CLICK TO DOWNLOAD PDF",
-                                data=pdf_data,
-                                file_name=f"Rocket_Engine_Results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                                mime="application/pdf",
-                                type="primary",
-                                use_container_width=True
-                            )
-                            st.success("✅ PDF ready for download!")
-                            st.balloons()
-                    else:
-                        st.error("❌ Please run 'RUN COMPREHENSIVE ANALYSIS' first")
-                        # Show previous PDF if exists
-                        if st.session_state.pdf_data and st.session_state.engine:
-                            st.markdown("---")
-                            st.download_button(
-                                label="📥 DOWNLOAD PREVIOUS PDF",
-                                data=st.session_state.pdf_data,
-                                file_name=f"Rocket_Engine_Results_Previous.pdf",
-                                mime="application/pdf",
-                                use_container_width=True
-                            )
 # ========== MAIN DASHBOARD ==========
 st.title("🚀 ULTIMATE ROCKET ENGINE ANALYSIS STUDIO")
 st.markdown("**Complete Professional Aerospace Engineering Tool**")
@@ -1586,9 +1967,10 @@ elif overall_eff > 85:
 else:
     st.error(f"## ❌ NEEDS IMPROVEMENT - Overall Efficiency: {overall_eff:.1f}%")
 
-# Main Tabs
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "📊 Performance", "🔥 Thermal", "🏗️ Structural", "🎵 Acoustic", "🔍 Differences", "🎨 3D Visualization"
+# Main Tabs - UPDATED TO 8 TABS
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+    "📊 Performance", "🔥 Thermal", "🏗️ Structural", "🎵 Acoustic", 
+    "🔄 Engine Cycle", "🚀 Nozzle Design", "🧪 Propellant", "🔍 Differences", "🎨 3D Visualization"
 ])
 
 with tab1:
@@ -1711,6 +2093,125 @@ with tab4:
             st.info(rec)
 
 with tab5:
+    st.subheader("Engine Cycle Analysis")
+    
+    if st.session_state.engine:
+        engine = st.session_state.engine
+        cycle_info = engine.analyze_engine_cycle()
+        
+        cols = st.columns(3)
+        with cols[0]:
+            st.metric("Cycle Efficiency", f"{cycle_info['efficiency']*100:.1f}%")
+        with cols[1]:
+            st.metric("Throttle Range", cycle_info['throttle_range'])
+        with cols[2]:
+            st.metric("Complexity", cycle_info['complexity'])
+        
+        st.write(f"**{cycle_info['cycle_name']}**")
+        st.write(cycle_info['description'])
+        st.write(f"**Examples:** {cycle_info['examples']}")
+        
+        # Cycle comparison chart
+        cycles = EngineCycleDatabase().CYCLES
+        cycle_names = list(cycles.keys())
+        efficiencies = [cycles[name]['efficiency'] * 100 for name in cycle_names]
+        
+        fig = go.Figure(data=[
+            go.Bar(
+                x=cycle_names,
+                y=efficiencies,
+                marker_color=['#10b981' if name == selected_cycle else '#3b82f6' for name in cycle_names],
+                text=[f"{eff:.1f}%" for eff in efficiencies],
+                textposition='auto'
+            )
+        ])
+        fig.update_layout(
+            title="Engine Cycle Efficiency Comparison",
+            yaxis_title="Efficiency (%)",
+            height=400
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+with tab6:
+    st.subheader("Nozzle Design Analysis")
+    
+    if st.session_state.engine:
+        engine = st.session_state.engine
+        nozzle_info = engine.analyze_nozzle_performance()
+        
+        cols = st.columns(3)
+        with cols[0]:
+            st.metric("Divergence Efficiency", f"{nozzle_info['divergence_efficiency']:.1f}%")
+        with cols[1]:
+            st.metric("Manufacturing Cost", nozzle_info['manufacturing_cost'])
+        with cols[2]:
+            st.metric("Cooling Complexity", nozzle_info['cooling_complexity'])
+        
+        st.write(f"**{nozzle_info['nozzle_type']}**")
+        st.write(f"**Application:** {nozzle_info['application']}")
+        
+        # Nozzle comparison
+        nozzles = NozzleDesignDatabase().NOZZLE_TYPES
+        nozzle_names = list(nozzles.keys())
+        efficiencies = [nozzles[name]['divergence_efficiency'] * 100 for name in nozzle_names]
+        
+        fig = go.Figure(data=[
+            go.Bar(
+                x=nozzle_names,
+                y=efficiencies,
+                marker_color=['#10b981' if name == selected_nozzle else '#3b82f6' for name in nozzle_names],
+                text=[f"{eff:.1f}%" for eff in efficiencies],
+                textposition='auto'
+            )
+        ])
+        fig.update_layout(
+            title="Nozzle Divergence Efficiency Comparison",
+            yaxis_title="Efficiency (%)",
+            height=400
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+with tab7:
+    st.subheader("Propellant Analysis")
+    
+    if st.session_state.engine:
+        engine = st.session_state.engine
+        prop_analysis = engine.analyze_propellant_type()
+        
+        cols = st.columns(3)
+        with cols[0]:
+            st.metric("Propellant Type", prop_analysis['type'])
+        with cols[1]:
+            st.metric("Optimal O/F", f"{prop_analysis['optimal_of_ratio']:.1f}")
+        with cols[2]:
+            st.metric("Characteristic Velocity", f"{prop_analysis['characteristic_velocity']:.0f} m/s")
+        
+        # Show type-specific details
+        if 'Solid' in prop_analysis['type']:
+            st.subheader("Solid Rocket Motor Characteristics")
+            st.metric("Burn Rate", f"{prop_analysis.get('burn_rate', 0):.2f} mm/s")
+            st.metric("Propellant Density", f"{prop_analysis.get('propellant_density', 0):.0f} kg/m³")
+            st.info("**Solid Rocket Advantages:** Simple, no moving parts, high reliability")
+        
+        elif 'Hybrid' in prop_analysis['type']:
+            st.subheader("Hybrid Rocket Characteristics")
+            st.metric("Regression Rate", f"{prop_analysis.get('regression_rate', 0):.2f} mm/s")
+            st.metric("Fuel Density", f"{prop_analysis.get('fuel_density', 0):.0f} kg/m³")
+            st.success("**Hybrid Rocket Advantages:** Throttleable, restartable, inherently safe")
+        
+        else:  # Liquid
+            st.subheader("Liquid Rocket Characteristics")
+            st.info("**Liquid Rocket Advantages:** Highest specific impulse, full throttle control, multiple restarts possible")
+        
+        # Propellant safety info
+        st.subheader("Safety & Handling")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Toxicity", prop_analysis['toxicity'])
+        with col2:
+            st.metric("Handling", prop_analysis['handling'])
+
+with tab8:
     st.subheader("Difference Explanations: Theoretical vs Experimental")
 
     for param, explanation in results['explanations'].items():
@@ -1732,7 +2233,7 @@ with tab5:
             for note in explanation.get('physics_notes', []):
                 st.markdown(f"• {note}")
 
-with tab6:
+with tab9:
     st.subheader("3D Engine Visualization")
 
     # Create 3D model
@@ -1818,6 +2319,7 @@ st.markdown(insights)
 
 st.success("""
 **✅ COMPREHENSIVE ANALYSIS COMPLETE**
-This professional-grade analysis includes: 15+ propellants, 6 advanced materials, 
-acoustic stability analysis, 3D visualization, and detailed physics-based difference explanations.
+This professional-grade analysis includes: 21 propellants, 6 advanced materials, 
+6 engine cycles, 6 nozzle designs, acoustic stability analysis, 3D visualization, 
+and detailed physics-based difference explanations.
 """)
