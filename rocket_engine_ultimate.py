@@ -1977,7 +1977,7 @@ else:
     st.error(f"## ❌ NEEDS IMPROVEMENT - Overall Efficiency: {overall_eff:.1f}%")
 
 # Main Tabs - UPDATED TO 8 TABS
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 , tab9 = st.tabs([
     "📊 Performance", "🔥 Thermal", "🏗️ Structural", "🎵 Acoustic", 
     "🔄 Engine Cycle", "🚀 Nozzle Design", "🧪 Propellant", "🔍 Differences", "🎨 3D Visualization"
 ])
