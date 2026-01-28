@@ -17,6 +17,15 @@ import warnings
 import math
 from scipy import signal
 
+# ========== ADD THE SAFE DIVISION FUNCTION HERE ==========
+def safe_divide(numerator, denominator, default=0.0):
+    """Safe division that prevents ZeroDivisionError"""
+    if denominator == 0:
+        return default
+    return numerator / denominator
+# ========== END SAFE DIVISION FUNCTION ==========
+
+
 warnings.filterwarnings('ignore')
 
 # ========== PAGE CONFIG ==========
