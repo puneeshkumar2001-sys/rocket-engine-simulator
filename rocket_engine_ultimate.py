@@ -2243,58 +2243,177 @@ with tab8:
                 st.markdown(f"• {note}")
 
 with tab9:
-    st.subheader("3D Engine Visualization")
-
-    # Create 3D model
-    try:
-        fig_3d = Visualization3D.create_simple_engine_visualization(
-            engine.Dc, engine.Lc, engine.Dt, engine.De, engine.Ln
+    st.header("🔥 3D Rocket Engine Visualization")
+    st.markdown("Interactive 3D model with real-time engine dimensions")
+    
+    if 'engine' in st.session_state:
+        engine = st.session_state.engine
+        
+        # Display engine info
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.subheader("🎨 3D Engine Model")
+            
+            # Try the 3D visualization
+            try:
+                # FIRST: Try the simple visualization (most reliable)
+                st.info("Generating 3D visualization...")
+                
+                fig_3d = Visualization3D.create_simple_engine_visualization(
+                    Dc=engine.Dc,
+                    Lc=engine.Lc, 
+                    Dt=engine.Dt,
+                    De=engine.De,
+                    Ln=engine.Ln
+                )
+                
+                st.plotly_chart(fig_3d, use_container_width=True)
+                st.success("✅ 3D Visualization Loaded Successfully!")
+                
+            except Exception as e:
+                st.error(f"❌ Error in 3D visualization: {str(e)}")
+                
+                # FALLBACK: Create a super simple 3D plot that always works
+                st.warning("Using simplified 3D view...")
+                
+                import plotly.graph_objects as go
+                
+                # Create a simple 3D scatter plot
+                x = [0, engine.Dc/2, engine.Dt/2, engine.De/2, engine.De/2]
+                y = [0, 0, engine.Lc, engine.Lc + engine.Ln, engine.Lc + engine.Ln*2]
+                z = [0, 0, 0, 0, 0]
+                
+                fig_fallback = go.Figure(data=[
+                    go.Scatter3d(
+                        x=x, y=y, z=z,
+                        mode='lines+markers',
+                        line=dict(width=6, color='red'),
+                        marker=dict(size=10, color='blue')
+                    )
+                ])
+                
+                fig_fallback.update_layout(
+                    title='Engine Profile (Fallback View)',
+                    scene=dict(
+                        xaxis_title='Diameter (m)',
+                        yaxis_title='Length (m)', 
+                        zaxis_title='Height (m)'
+                    ),
+                    height=500
+                )
+                
+                st.plotly_chart(fig_fallback, use_container_width=True)
+        
+        with col2:
+            st.subheader("📐 Engine Dimensions")
+            
+            # Display metrics
+            st.metric("Chamber Diameter", f"{engine.Dc:.3f} m")
+            st.metric("Chamber Length", f"{engine.Lc:.3f} m")
+            st.metric("Throat Diameter", f"{engine.Dt:.3f} m")
+            st.metric("Exit Diameter", f"{engine.De:.3f} m")
+            st.metric("Nozzle Length", f"{engine.Ln:.3f} m")
+            
+            # Plume info
+            st.subheader("🔥 Exhaust Plume")
+            plume_length = engine.Ln * 2.5
+            st.metric("Plume Length", f"{plume_length:.1f} m")
+            st.metric("Expansion Ratio", f"{engine.params['expansion_ratio']:.0f}")
+            
+            # 3D Controls
+            st.subheader("🎮 3D Controls")
+            if st.button("🔄 Refresh View", use_container_width=True):
+                st.rerun()
+                
+            view_mode = st.selectbox(
+                "View Mode",
+                ["Full Engine", "Chamber Only", "Nozzle Only", "Plume Only"]
+            )
+            
+            show_grid = st.checkbox("Show Grid", True)
+            show_axes = st.checkbox("Show Axes", True)
+    
+    else:
+        # No engine simulation yet
+        st.warning("⚠️ No engine simulation found!")
+        st.info("""
+        To see 3D visualization:
+        1. Go to the sidebar
+        2. Set your engine parameters  
+        3. Click '🔄 UPDATE SIMULATION'
+        4. Return to this tab
+        """)
+        
+        # Show example image
+        st.image(
+            "https://images.unsplash.com/photo-1614726365952-510103b1bbb4?w=800&h=400&fit=crop",
+            caption="Example: 3D Rocket Engine Visualization"
         )
-    except Exception as e:
-        st.error(f"3D Visualization error: {e}")
-        # Create a simple alternative visualization
-        fig_3d = go.Figure()
-        fig_3d.add_trace(go.Scatter3d(
-            x=[0, engine.Dc / 2, engine.Dt / 2, engine.De / 2],
-            y=[0, 0, 0, 0],
-            z=[0, engine.Lc, engine.Lc + engine.Ln / 2, engine.Lc + engine.Ln],
-            mode='lines+markers',
-            line=dict(width=4, color='red'),
-            marker=dict(size=5, color='blue')
+        
+        # Quick demo button
+        if st.button("🚀 Load Demo Engine", type="primary"):
+            # Create demo engine
+            demo_params = {
+                'thrust': 1000,
+                'Pc': 20.0,
+                'of_ratio': 2.5,
+                'burn_time': 10,
+                'propellant': 'RP-1/LOX',
+                'expansion_ratio': 40,
+                'material': 'Copper (OFHC)',
+                'injector_type': 'coaxial'
+            }
+            st.session_state.engine = UltimateRocketEngine(demo_params)
+            st.rerun()
+
+    # Add nozzle profile chart (2D - always works)
+    st.markdown("---")
+    st.subheader("📈 Nozzle Profile (2D View)")
+    
+    if 'engine' in st.session_state:
+        engine = st.session_state.engine
+        
+        # Create 2D nozzle profile
+        import plotly.graph_objects as go
+        
+        z = np.linspace(0, engine.Ln, 100)
+        r = engine.Dt/2 + (engine.De/2 - engine.Dt/2) * (z/engine.Ln)**2
+        
+        fig_2d = go.Figure()
+        fig_2d.add_trace(go.Scatter(
+            x=z, 
+            y=r, 
+            fill='tozeroy',
+            line=dict(color='blue', width=3),
+            name='Nozzle Wall'
         ))
-        fig_3d.update_layout(
-            title='Engine Profile (3D view unavailable)',
-            scene=dict(
-                xaxis_title='Diameter (m)',
-                yaxis_title='Y (m)',
-                zaxis_title='Length (m)'
-            ),
-            height=500
+        fig_2d.add_trace(go.Scatter(
+            x=z, 
+            y=-r, 
+            fill='tonexty',
+            line=dict(color='blue', width=3),
+            name='Lower Wall'
+        ))
+        
+        # Add throat marker
+        fig_2d.add_trace(go.Scatter(
+            x=[0], 
+            y=[0],
+            mode='markers',
+            marker=dict(size=15, color='red', symbol='diamond'),
+            name='Throat'
+        ))
+        
+        fig_2d.update_layout(
+            title='Nozzle Contour Profile',
+            xaxis_title='Length from Throat (m)',
+            yaxis_title='Radius (m)',
+            height=400,
+            showlegend=True
         )
-
-    st.plotly_chart(fig_3d, use_container_width=True)
-
-    # Plume visualization
-    st.subheader("Exhaust Plume Characteristics")
-
-    # Simulate plume
-    z_plume = np.linspace(0, 5, 100)
-    r_plume = engine.De / 2 * (1 + 0.3 * z_plume ** 0.7)
-
-    fig_plume = go.Figure()
-    fig_plume.add_trace(go.Scatter(x=z_plume, y=r_plume, fill='tozeroy',
-                                   line=dict(color='orange', width=3),
-                                   name='Plume Boundary'))
-    fig_plume.add_trace(go.Scatter(x=z_plume, y=-r_plume, fill='tonexty',
-                                   line=dict(color='orange', width=3),
-                                   showlegend=False))
-
-    fig_plume.update_layout(title="Exhaust Plume Expansion",
-                            xaxis_title="Distance from Exit (m)",
-                            yaxis_title="Plume Radius (m)",
-                            height=400)
-
-    st.plotly_chart(fig_plume, use_container_width=True)
+        
+        st.plotly_chart(fig_2d, use_container_width=True)
 
 # ========== FINAL SUMMARY ==========
 st.markdown("---")
