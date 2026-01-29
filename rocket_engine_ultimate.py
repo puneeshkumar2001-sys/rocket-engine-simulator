@@ -1815,7 +1815,7 @@ class UltimateRocketEngine:
             'examples': cycle['examples']
         }
     
-            def analyze_nozzle_performance(self):
+    def analyze_nozzle_performance(self):
         """Analyze nozzle type performance with C-D classification"""
         print("DEBUG: analyze_nozzle_performance called")
         nozzle_type = self.params.get('nozzle_type', 'C-D (Converging-Diverging)')
@@ -1834,8 +1834,7 @@ class UltimateRocketEngine:
             'application': nozzle['application'],
             'cooling_complexity': nozzle['cooling_complexity'],
             'description': nozzle.get('description', 'Standard nozzle design')
-        }
-    
+        }       
     def analyze_propellant_type(self):
         """Analyze propellant-specific characteristics"""
         propellant = self.params['propellant']
