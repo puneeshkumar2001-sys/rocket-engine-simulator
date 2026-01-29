@@ -17,13 +17,14 @@ import warnings
 import math
 from scipy import signal
 
-# ========== ADD THE SAFE DIVISION FUNCTION HERE ==========
-def safe_divide(numerator, denominator, default=0.0):
+def safe_divide(a, b, default=0.0):
     """Safe division that prevents ZeroDivisionError"""
-    if denominator == 0:
+    try:
+        if b == 0:
+            return default
+        return a / b
+    except:
         return default
-    return numerator / denominator
-# ========== END SAFE DIVISION FUNCTION ==========
 
 
 warnings.filterwarnings('ignore')
@@ -495,56 +496,113 @@ class EngineCycleDatabase:
 
 # ========== NOZZLE DESIGN DATABASE ==========
 class NozzleDesignDatabase:
-    """Advanced nozzle configurations and performance"""
+    """Advanced nozzle configurations and performance with C-D nozzles"""
     
     NOZZLE_TYPES = {
+        # STANDARD ROCKET NOZZLES (5 types)
         'Conical (15°)': {
+            'type': 'Conical',
             'divergence_efficiency': 0.96,
             'manufacturing_cost': 'Low',
             'length_factor': 1.0,
             'weight_factor': 1.0,
             'cooling_complexity': 'Low',
-            'application': 'Small engines, upper stages'
+            'application': 'Small engines, upper stages',
+            'description': 'Simple conical design with fixed 15° half-angle'
         },
         'Bell (NASA-SP)': {
+            'type': 'Bell',
             'divergence_efficiency': 0.98,
             'manufacturing_cost': 'Medium',
             'length_factor': 0.8,
             'weight_factor': 0.9,
             'cooling_complexity': 'Medium',
-            'application': 'Medium engines, balance perf/length'
+            'application': 'Medium engines, balance perf/length',
+            'description': 'Optimized bell-shaped contour from NASA SP-125'
         },
+        'Bell (Rao)': {
+            'type': 'Bell',
+            'divergence_efficiency': 0.985,
+            'manufacturing_cost': 'High',
+            'length_factor': 0.7,
+            'weight_factor': 0.85,
+            'cooling_complexity': 'High',
+            'application': 'High-performance engines',
+            'description': 'Rao-optimized bell nozzle with parabolic contour'
+        },
+        
+        # C-D NOZZLES (3 types) - ADDED
+        'C-D (Converging-Diverging)': {
+            'type': 'C-D',
+            'divergence_efficiency': 0.97,
+            'manufacturing_cost': 'Medium',
+            'length_factor': 1.2,
+            'weight_factor': 1.1,
+            'cooling_complexity': 'Medium',
+            'application': 'Standard rocket engines',
+            'description': 'Classic converging-diverging De Laval nozzle'
+        },
+        'C-D (Short)': {
+            'type': 'C-D',
+            'divergence_efficiency': 0.95,
+            'manufacturing_cost': 'Low',
+            'length_factor': 0.9,
+            'weight_factor': 0.95,
+            'cooling_complexity': 'Low',
+            'application': 'Space-constrained installations',
+            'description': 'Short-length C-D nozzle for compact designs'
+        },
+        'C-D (Optimized)': {
+            'type': 'C-D',
+            'divergence_efficiency': 0.975,
+            'manufacturing_cost': 'High',
+            'length_factor': 1.1,
+            'weight_factor': 1.05,
+            'cooling_complexity': 'High',
+            'application': 'High-expansion engines',
+            'description': 'Optimized C-D with contour-matching'
+        },
+        
+        # ADVANCED NOZZLES (4 types)
         'Aerospike (Linear)': {
+            'type': 'Aerospike',
             'divergence_efficiency': 0.99,
             'manufacturing_cost': 'Very High',
             'length_factor': 0.6,
             'weight_factor': 1.2,
             'cooling_complexity': 'Very High',
-            'application': 'Altitude compensation, SSTO'
+            'application': 'Altitude compensation, SSTO',
+            'description': 'Linear aerospike for altitude adaptation'
         },
         'Aerospike (Annular)': {
+            'type': 'Aerospike',
             'divergence_efficiency': 0.99,
             'manufacturing_cost': 'Extremely High',
             'length_factor': 0.5,
             'weight_factor': 1.3,
             'cooling_complexity': 'Extremely High',
-            'application': 'Advanced SSTO, spaceplanes'
+            'application': 'Advanced SSTO, spaceplanes',
+            'description': 'Annular aerospike with 360° expansion'
         },
         'Dual-Bell': {
+            'type': 'Dual-Bell',
             'divergence_efficiency': 0.97,
             'manufacturing_cost': 'High',
             'length_factor': 1.1,
             'weight_factor': 1.1,
             'cooling_complexity': 'High',
-            'application': 'Two-stage-to-orbit optimization'
+            'application': 'Two-stage-to-orbit optimization',
+            'description': 'Dual-mode nozzle for sea-level/vacuum operation'
         },
         'Expansion-Deflection': {
+            'type': 'ED',
             'divergence_efficiency': 0.96,
             'manufacturing_cost': 'High',
             'length_factor': 0.9,
             'weight_factor': 1.1,
             'cooling_complexity': 'Medium',
-            'application': 'Compact installations'
+            'application': 'Compact installations',
+            'description': 'Radial expansion with central plug'
         }
     }
 
@@ -1360,76 +1418,79 @@ class Visualization3D:
 
         return fig
 
-    @staticmethod
+        @staticmethod
     def create_simple_engine_visualization(Dc, Lc, Dt, De, Ln):
-        """Simplified but working 3D visualization"""
+        """ULTRA-SIMPLE 3D visualization that always works"""
+        import plotly.graph_objects as go
+        
         fig = go.Figure()
-
-        # Chamber (simple cylinder)
-        n_points = 50
-        theta = np.linspace(0, 2 * np.pi, n_points)
-        z_chamber = np.linspace(0, Lc, n_points)
-        theta_grid, z_grid = np.meshgrid(theta, z_chamber)
-
-        x_chamber = (Dc / 2) * np.cos(theta_grid)
-        y_chamber = (Dc / 2) * np.sin(theta_grid)
-
-        # Nozzle (simpler approach)
-        z_nozzle = np.linspace(0, Ln, n_points)
-        z_norm = z_nozzle / Ln
-        r_nozzle = Dt / 2 + (De / 2 - Dt / 2) * z_norm ** 2
-
-        # Proper broadcasting
-        r_nozzle_grid = np.tile(r_nozzle, (n_points, 1))
-        theta_nozzle_grid = np.tile(theta, (n_points, 1)).T
-
-        x_nozzle = r_nozzle_grid * np.cos(theta_nozzle_grid)
-        y_nozzle = r_nozzle_grid * np.sin(theta_nozzle_grid)
-        z_nozzle_grid = np.tile(z_nozzle, (n_points, 1))
-
-        # Add surfaces
-        fig.add_trace(go.Surface(
-            x=x_chamber, y=y_chamber, z=z_grid,
-            colorscale='Reds',
-            opacity=0.8,
+        
+        # Just show a 3D wireframe of key points
+        # Chamber points
+        chamber_points = {
+            'x': [0, Dc/2, Dc/2, 0, -Dc/2, -Dc/2, 0],
+            'y': [0, 0, Lc, Lc, Lc, 0, 0],
+            'z': [0, 0, 0, 0, 0, 0, 0]
+        }
+        
+        # Nozzle points
+        nozzle_points = {
+            'x': [Dt/2, De/2, -De/2, -Dt/2, Dt/2],
+            'y': [Lc, Lc+Ln, Lc+Ln, Lc, Lc],
+            'z': [0, 0, 0, 0, 0]
+        }
+        
+        # Plume points
+        plume_points = {
+            'x': [De/2, De, -De, -De/2, De/2],
+            'y': [Lc+Ln, Lc+Ln*2, Lc+Ln*2, Lc+Ln, Lc+Ln],
+            'z': [0, 0, 0, 0, 0]
+        }
+        
+        # Add traces
+        fig.add_trace(go.Scatter3d(
+            x=chamber_points['x'],
+            y=chamber_points['y'],
+            z=chamber_points['z'],
+            mode='lines+markers',
+            line=dict(width=8, color='red'),
+            marker=dict(size=10, color='darkred'),
             name='Chamber'
         ))
-
-        fig.add_trace(go.Surface(
-            x=x_nozzle, y=y_nozzle, z=z_nozzle_grid.T + Lc,
-            colorscale='Blues',
-            opacity=0.8,
+        
+        fig.add_trace(go.Scatter3d(
+            x=nozzle_points['x'],
+            y=nozzle_points['y'],
+            z=nozzle_points['z'],
+            mode='lines+markers',
+            line=dict(width=6, color='blue'),
+            marker=dict(size=8, color='darkblue'),
             name='Nozzle'
         ))
-
-        # Add plume (simplified)
-        z_plume = np.linspace(0, Ln * 2, 30)
-        r_plume = De / 2 * (1 + 0.3 * (z_plume / Ln) ** 0.7)
-
-        theta_plume = np.linspace(0, 2 * np.pi, 50)
-        z_plume_grid, theta_plume_grid = np.meshgrid(z_plume, theta_plume)
-        r_plume_grid = np.tile(r_plume, (50, 1))
-
-        x_plume = r_plume_grid * np.cos(theta_plume_grid)
-        y_plume = r_plume_grid * np.sin(theta_plume_grid)
-
-        fig.add_trace(go.Surface(
-            x=x_plume, y=y_plume, z=z_plume_grid.T + Lc + Ln,
-            colorscale='Hot',
-            opacity=0.5,
+        
+        fig.add_trace(go.Scatter3d(
+            x=plume_points['x'],
+            y=plume_points['y'],
+            z=plume_points['z'],
+            mode='lines+markers',
+            line=dict(width=4, color='orange'),
+            marker=dict(size=6, color='darkorange'),
             name='Plume'
         ))
-
+        
         fig.update_layout(
-            title='3D Rocket Engine Model',
+            title='3D Rocket Engine Outline',
             scene=dict(
-                xaxis_title='X (m)',
-                yaxis_title='Y (m)',
-                zaxis_title='Z (m)'
+                xaxis_title='Diameter (m)',
+                yaxis_title='Length (m)',
+                zaxis_title='Height (m)',
+                camera=dict(
+                    eye=dict(x=1.5, y=1.2, z=1.0)
+                )
             ),
-            height=600
+            height=500
         )
-
+        
         return fig
 
 
@@ -1751,18 +1812,24 @@ class UltimateRocketEngine:
         }
     
     def analyze_nozzle_performance(self):
-        """Analyze nozzle type performance"""
-        nozzle_type = self.params.get('nozzle_type', 'Bell (NASA-SP)')
-        nozzle = self.nozzles.NOZZLE_TYPES[nozzle_type]
-        
-        return {
-            'nozzle_type': nozzle_type,
-            'divergence_efficiency': nozzle['divergence_efficiency'] * 100,
-            'length_factor': nozzle['length_factor'],
-            'manufacturing_cost': nozzle['manufacturing_cost'],
-            'application': nozzle['application'],
-            'cooling_complexity': nozzle['cooling_complexity']
-        }
+    """Analyze nozzle type performance"""
+    nozzle_type = self.params.get('nozzle_type', 'Bell (NASA-SP)')
+    nozzle = self.nozzles.NOZZLE_TYPES[nozzle_type]
+    
+    # Determine if it's a C-D nozzle
+    is_cd_nozzle = nozzle['type'] == 'C-D'
+    
+    return {
+        'nozzle_type': nozzle_type,
+        'nozzle_category': nozzle['type'],  # Added: C-D, Bell, Aerospike, etc.
+        'is_cd_nozzle': is_cd_nozzle,  # Boolean for C-D type
+        'divergence_efficiency': nozzle['divergence_efficiency'] * 100,
+        'length_factor': nozzle['length_factor'],
+        'manufacturing_cost': nozzle['manufacturing_cost'],
+        'application': nozzle['application'],
+        'cooling_complexity': nozzle['cooling_complexity'],
+        'description': nozzle['description']
+    }
     
     def analyze_propellant_type(self):
         """Analyze propellant-specific characteristics"""
@@ -1886,7 +1953,7 @@ with st.sidebar:
     selected_nozzle = st.selectbox(
         "Nozzle Type",
         nozzles_list,
-        index=1,
+        index=0,
         help="Select nozzle design type"
     )
     
@@ -2148,27 +2215,59 @@ with tab6:
         engine = st.session_state.engine
         nozzle_info = engine.analyze_nozzle_performance()
         
+        # Highlight if it's a C-D nozzle
+        if nozzle_info['is_cd_nozzle']:
+            st.success(f"✅ **{nozzle_info['nozzle_type']}** - Converging-Diverging Nozzle Selected")
+        else:
+            st.info(f"📐 **{nozzle_info['nozzle_type']}** - {nozzle_info['nozzle_category']} Nozzle Selected")
+        
         cols = st.columns(3)
         with cols[0]:
             st.metric("Divergence Efficiency", f"{nozzle_info['divergence_efficiency']:.1f}%")
+            st.metric("Nozzle Type", nozzle_info['nozzle_category'])
         with cols[1]:
             st.metric("Manufacturing Cost", nozzle_info['manufacturing_cost'])
-        with cols[2]:
             st.metric("Cooling Complexity", nozzle_info['cooling_complexity'])
+        with cols[2]:
+            st.metric("Length Factor", f"{nozzle_info['length_factor']:.1f}x")
+            st.metric("Weight Factor", f"{nozzle_info['nozzles'].NOZZLE_TYPES[nozzle_info['nozzle_type']]['weight_factor']:.1f}x")
         
-        st.write(f"**{nozzle_info['nozzle_type']}**")
+        # Nozzle description
+        st.write(f"**Description:** {nozzle_info['description']}")
         st.write(f"**Application:** {nozzle_info['application']}")
         
-        # Nozzle comparison
+        # C-D Nozzle specific info
+        if nozzle_info['is_cd_nozzle']:
+            st.info("""
+            **C-D (Converging-Diverging) Nozzle Characteristics:**
+            • Converging section accelerates flow to Mach 1 at throat
+            • Diverging section expands flow to supersonic speeds
+            • Classic De Laval nozzle design
+            • Most common in rocket propulsion
+            """)
+        
+        # Nozzle comparison chart with C-D highlighted
+        st.subheader("Nozzle Type Comparison")
+        
         nozzles = NozzleDesignDatabase().NOZZLE_TYPES
         nozzle_names = list(nozzles.keys())
         efficiencies = [nozzles[name]['divergence_efficiency'] * 100 for name in nozzle_names]
+        
+        # Color coding: C-D nozzles in green
+        colors = []
+        for name in nozzle_names:
+            if nozzles[name]['type'] == 'C-D':
+                colors.append('#10b981')  # Green for C-D
+            elif name == nozzle_info['nozzle_type']:
+                colors.append('#3b82f6')  # Blue for selected
+            else:
+                colors.append('#94a3b8')  # Gray for others
         
         fig = go.Figure(data=[
             go.Bar(
                 x=nozzle_names,
                 y=efficiencies,
-                marker_color=['#10b981' if name == selected_nozzle else '#3b82f6' for name in nozzle_names],
+                marker_color=colors,
                 text=[f"{eff:.1f}%" for eff in efficiencies],
                 textposition='auto'
             )
@@ -2176,9 +2275,31 @@ with tab6:
         fig.update_layout(
             title="Nozzle Divergence Efficiency Comparison",
             yaxis_title="Efficiency (%)",
-            height=400
+            height=500,
+            xaxis_tickangle=-45
         )
         st.plotly_chart(fig, use_container_width=True)
+        
+        # Quick selection guide
+        st.subheader("🔄 Quick Nozzle Selector")
+        
+        col_select1, col_select2, col_select3 = st.columns(3)
+        
+        with col_select1:
+            if st.button("Select C-D Nozzle", use_container_width=True):
+                # Update to C-D nozzle
+                engine.params['nozzle_type'] = 'C-D (Converging-Diverging)'
+                st.rerun()
+        
+        with col_select2:
+            if st.button("Select Bell Nozzle", use_container_width=True):
+                engine.params['nozzle_type'] = 'Bell (NASA-SP)'
+                st.rerun()
+        
+        with col_select3:
+            if st.button("Select Aerospike", use_container_width=True):
+                engine.params['nozzle_type'] = 'Aerospike (Linear)'
+                st.rerun()
 
 with tab7:
     st.subheader("Propellant Analysis")
@@ -2253,58 +2374,60 @@ with tab9:
         col1, col2 = st.columns([2, 1])
         
         with col1:
-            st.subheader("🎨 3D Engine Model")
-            
-            # Try the 3D visualization
-            try:
-                # FIRST: Try the simple visualization (most reliable)
-                st.info("Generating 3D visualization...")
-                
-                fig_3d = Visualization3D.create_simple_engine_visualization(
-                    Dc=engine.Dc,
-                    Lc=engine.Lc, 
-                    Dt=engine.Dt,
-                    De=engine.De,
-                    Ln=engine.Ln
-                )
-                
-                st.plotly_chart(fig_3d, use_container_width=True)
-                st.success("✅ 3D Visualization Loaded Successfully!")
-                
-            except Exception as e:
-                st.error(f"❌ Error in 3D visualization: {str(e)}")
-                
-                # FALLBACK: Create a super simple 3D plot that always works
-                st.warning("Using simplified 3D view...")
-                
-                import plotly.graph_objects as go
-                
-                # Create a simple 3D scatter plot
-                x = [0, engine.Dc/2, engine.Dt/2, engine.De/2, engine.De/2]
-                y = [0, 0, engine.Lc, engine.Lc + engine.Ln, engine.Lc + engine.Ln*2]
-                z = [0, 0, 0, 0, 0]
-                
-                fig_fallback = go.Figure(data=[
-                    go.Scatter3d(
-                        x=x, y=y, z=z,
-                        mode='lines+markers',
-                        line=dict(width=6, color='red'),
-                        marker=dict(size=10, color='blue')
-                    )
-                ])
-                
-                fig_fallback.update_layout(
-                    title='Engine Profile (Fallback View)',
-                    scene=dict(
-                        xaxis_title='Diameter (m)',
-                        yaxis_title='Length (m)', 
-                        zaxis_title='Height (m)'
-                    ),
-                    height=500
-                )
-                
-                st.plotly_chart(fig_fallback, use_container_width=True)
+    st.subheader("🎨 3D Engine Model")
+    
+    # DEBUG: Check dimensions - CORRECT INDENTATION (4 spaces)
+    st.write(f"DEBUG: Dc={engine.Dc}, Lc={engine.Lc}, Dt={engine.Dt}, De={engine.De}, Ln={engine.Ln}")
+    
+    # Try the 3D visualization
+    try:
+        # FIRST: Try the simple visualization (most reliable)
+        st.info("Generating 3D visualization...")
         
+        fig_3d = Visualization3D.create_simple_engine_visualization(
+            Dc=engine.Dc,
+            Lc=engine.Lc, 
+            Dt=engine.Dt,
+            De=engine.De,
+            Ln=engine.Ln
+        )
+        
+        st.plotly_chart(fig_3d, use_container_width=True)
+        st.success("✅ 3D Visualization Loaded Successfully!")
+        
+    except Exception as e:
+        st.error(f"❌ Error in 3D visualization: {str(e)}")
+        
+        # FALLBACK: Create a super simple 3D plot that always works
+        st.warning("Using simplified 3D view...")
+        
+        import plotly.graph_objects as go
+        
+        # Create a simple 3D scatter plot
+        x = [0, engine.Dc/2, engine.Dt/2, engine.De/2, engine.De/2]
+        y = [0, 0, engine.Lc, engine.Lc + engine.Ln, engine.Lc + engine.Ln*2]
+        z = [0, 0, 0, 0, 0]
+        
+        fig_fallback = go.Figure(data=[
+            go.Scatter3d(
+                x=x, y=y, z=z,
+                mode='lines+markers',
+                line=dict(width=6, color='red'),
+                marker=dict(size=10, color='blue')
+            )
+        ])
+        
+        fig_fallback.update_layout(
+            title='Engine Profile (Fallback View)',
+            scene=dict(
+                xaxis_title='Diameter (m)',
+                yaxis_title='Length (m)', 
+                zaxis_title='Height (m)'
+            ),
+            height=500
+        )
+        
+        st.plotly_chart(fig_fallback, use_container_width=True)
         with col2:
             st.subheader("📐 Engine Dimensions")
             
