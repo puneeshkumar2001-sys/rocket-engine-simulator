@@ -1875,6 +1875,83 @@ class RocketEngineML:
         
         return suggestions
 
+# ========== SIMPLE FLOW VISUALIZATION ==========
+class FlowVisualizer:
+    """Show CFD-like flow patterns without real CFD"""
+    
+    @staticmethod
+    def create_mach_contour(Dc, Lc, Dt, De, Ln):
+        """Create pretty Mach number contour plot"""
+        import plotly.graph_objects as go
+        import numpy as np
+        
+        # Use YOUR engine geometry
+        z = np.linspace(0, Lc + Ln, 100)
+        r = np.zeros_like(z)
+        
+        # Create engine profile
+        for i, zi in enumerate(z):
+            if zi < Lc:  # Chamber
+                r[i] = Dc/2
+            elif zi < Lc + Ln/3:  # Converging
+                r[i] = Dc/2 - (Dc/2 - Dt/2) * ((zi - Lc) / (Ln/3))
+            elif zi < Lc + 2*Ln/3:  # Throat region
+                r[i] = Dt/2
+            else:  # Diverging
+                r[i] = Dt/2 + (De/2 - Dt/2) * ((zi - (Lc + 2*Ln/3)) / (Ln/3))
+        
+        # Create "Mach number" (simplified)
+        Mach = np.zeros_like(z)
+        for i, zi in enumerate(z):
+            if zi < Lc:  # Chamber: subsonic
+                Mach[i] = 0.3
+            elif zi < Lc + Ln/3:  # Converging: accelerating
+                Mach[i] = 0.3 + 0.7 * ((zi - Lc) / (Ln/3))
+            elif zi < Lc + Ln/3 + 0.1:  # Throat: Mach 1
+                Mach[i] = 1.0
+            else:  # Diverging: supersonic
+                Mach[i] = 1.0 + 3.0 * ((zi - (Lc + Ln/3 + 0.1)) / (2*Ln/3))
+        
+        # Create contour plot
+        fig = go.Figure()
+        
+        # Add engine wall
+        fig.add_trace(go.Scatter(
+            x=z, y=r, mode='lines', line=dict(color='black', width=3),
+            name='Engine Wall', fill='tozeroy'
+        ))
+        
+        # Add mirrored wall
+        fig.add_trace(go.Scatter(
+            x=z, y=-r, mode='lines', line=dict(color='black', width=3),
+            showlegend=False, fill='tonexty'
+        ))
+        
+        # Add Mach number color fill
+        fig.add_trace(go.Scatter(
+            x=z, y=r, mode='none',
+            fill='tozeroy',
+            fillcolor='rgba(255,0,0,0.1)',
+            showlegend=False
+        ))
+        
+        # Add Mach number line
+        fig.add_trace(go.Scatter(
+            x=z, y=Mach * 0.1,  # Scale for visibility
+            mode='lines', line=dict(color='blue', width=2),
+            name='Mach Number (scaled)'
+        ))
+        
+        fig.update_layout(
+            title='Flow Analysis: Mach Number Along Engine',
+            xaxis_title='Engine Length (m)',
+            yaxis_title='Radius / Mach (scaled)',
+            height=400
+        )
+        
+        return fig
+
+
 
 # ========== MAIN ENGINE SIMULATION ==========
 class UltimateRocketEngine:
@@ -2310,11 +2387,11 @@ elif overall_eff > 85:
 else:
     st.error(f"## ❌ NEEDS IMPROVEMENT - Overall Efficiency: {overall_eff:.1f}%")
 
-# Main Tabs - UPDATED TO 10 TABS
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
+# Main Tabs - UPDATED TO 11 TABS
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs([
     "📊 Performance", "🔥 Thermal", "🏗️ Structural", "🎵 Acoustic", 
     "🔄 Engine Cycle", "🚀 Nozzle Design", "🧪 Propellant", "🔍 Differences", 
-    "🎨 3D Visualization", "🤖 AI/ML Predictions"  # <-- tab10 is this one
+    "🎨 3D Visualization", "🤖 AI/ML", "🌪️ Flow Analysis"  # NEW TAB
 ])
 
 with tab1:
@@ -2876,6 +2953,39 @@ with tab10:
     
     else:
         st.info("👈 Configure engine parameters first to see ML predictions")
+
+with tab11:
+    st.header("🌪️ Flow Analysis")
+    st.markdown("**CFD Concepts & Flow Visualization**")
+    
+    if engine:
+        # Simple flow analysis
+        fig = FlowVisualizer.create_mach_contour(
+            engine.Dc, engine.Lc, engine.Dt, 
+            engine.De, engine.Ln
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Simple calculations
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Chamber Mach", "0.1-0.3", "Subsonic")
+        with col2:
+            st.metric("Throat Mach", "1.0", "Sonic")
+        with col3:
+            st.metric("Exit Mach", "3.0-5.0", "Supersonic")
+        
+        # Educational content
+        st.info("""
+        **What CFD Would Show:**
+        • Shock waves in over-expanded nozzle
+        • Boundary layer development  
+        • Flow separation at high expansion
+        • Recirculation zones
+        • Temperature contours
+        """)
+    else:
+        st.info("Configure engine to see flow analysis")
         
 # ========== FINAL SUMMARY ==========
 st.markdown("---")
