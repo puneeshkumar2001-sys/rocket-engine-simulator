@@ -2378,60 +2378,61 @@ with tab9:
         col1, col2 = st.columns([2, 1])
         
         with col1:
-    st.subheader("🎨 3D Engine Model")
-    
-    # DEBUG: Check dimensions - CORRECT INDENTATION (4 spaces)
-    st.write(f"DEBUG: Dc={engine.Dc}, Lc={engine.Lc}, Dt={engine.Dt}, De={engine.De}, Ln={engine.Ln}")
-    
-    # Try the 3D visualization
-    try:
-        # FIRST: Try the simple visualization (most reliable)
-        st.info("Generating 3D visualization...")
+            st.subheader("🎨 3D Engine Model")
+            
+            # DEBUG: Check dimensions
+            st.write(f"DEBUG: Dc={engine.Dc}, Lc={engine.Lc}, Dt={engine.Dt}, De={engine.De}, Ln={engine.Ln}")
+            
+            # Try the 3D visualization
+            try:
+                # FIRST: Try the simple visualization (most reliable)
+                st.info("Generating 3D visualization...")
+                
+                fig_3d = Visualization3D.create_simple_engine_visualization(
+                    Dc=engine.Dc,
+                    Lc=engine.Lc, 
+                    Dt=engine.Dt,
+                    De=engine.De,
+                    Ln=engine.Ln
+                )
+                
+                st.plotly_chart(fig_3d, use_container_width=True)
+                st.success("✅ 3D Visualization Loaded Successfully!")
+                
+            except Exception as e:
+                st.error(f"❌ Error in 3D visualization: {str(e)}")
+                
+                # FALLBACK: Create a super simple 3D plot that always works
+                st.warning("Using simplified 3D view...")
+                
+                import plotly.graph_objects as go
+                
+                # Create a simple 3D scatter plot
+                x = [0, engine.Dc/2, engine.Dt/2, engine.De/2, engine.De/2]
+                y = [0, 0, engine.Lc, engine.Lc + engine.Ln, engine.Lc + engine.Ln*2]
+                z = [0, 0, 0, 0, 0]
+                
+                fig_fallback = go.Figure(data=[
+                    go.Scatter3d(
+                        x=x, y=y, z=z,
+                        mode='lines+markers',
+                        line=dict(width=6, color='red'),
+                        marker=dict(size=10, color='blue')
+                    )
+                ])
+                
+                fig_fallback.update_layout(
+                    title='Engine Profile (Fallback View)',
+                    scene=dict(
+                        xaxis_title='Diameter (m)',
+                        yaxis_title='Length (m)', 
+                        zaxis_title='Height (m)'
+                    ),
+                    height=500
+                )
+                
+                st.plotly_chart(fig_fallback, use_container_width=True)
         
-        fig_3d = Visualization3D.create_simple_engine_visualization(
-            Dc=engine.Dc,
-            Lc=engine.Lc, 
-            Dt=engine.Dt,
-            De=engine.De,
-            Ln=engine.Ln
-        )
-        
-        st.plotly_chart(fig_3d, use_container_width=True)
-        st.success("✅ 3D Visualization Loaded Successfully!")
-        
-    except Exception as e:
-        st.error(f"❌ Error in 3D visualization: {str(e)}")
-        
-        # FALLBACK: Create a super simple 3D plot that always works
-        st.warning("Using simplified 3D view...")
-        
-        import plotly.graph_objects as go
-        
-        # Create a simple 3D scatter plot
-        x = [0, engine.Dc/2, engine.Dt/2, engine.De/2, engine.De/2]
-        y = [0, 0, engine.Lc, engine.Lc + engine.Ln, engine.Lc + engine.Ln*2]
-        z = [0, 0, 0, 0, 0]
-        
-        fig_fallback = go.Figure(data=[
-            go.Scatter3d(
-                x=x, y=y, z=z,
-                mode='lines+markers',
-                line=dict(width=6, color='red'),
-                marker=dict(size=10, color='blue')
-            )
-        ])
-        
-        fig_fallback.update_layout(
-            title='Engine Profile (Fallback View)',
-            scene=dict(
-                xaxis_title='Diameter (m)',
-                yaxis_title='Length (m)', 
-                zaxis_title='Height (m)'
-            ),
-            height=500
-        )
-        
-        st.plotly_chart(fig_fallback, use_container_width=True)
         with col2:
             st.subheader("📐 Engine Dimensions")
             
