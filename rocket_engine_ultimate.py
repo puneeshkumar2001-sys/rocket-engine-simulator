@@ -1815,25 +1815,25 @@ class UltimateRocketEngine:
             'examples': cycle['examples']
         }
     
-    def analyze_nozzle_performance(self):
-    """Analyze nozzle type performance"""
-    nozzle_type = self.params.get('nozzle_type', 'Bell (NASA-SP)')
-    nozzle = self.nozzles.NOZZLE_TYPES[nozzle_type]
-    
-    # Determine if it's a C-D nozzle
-    is_cd_nozzle = nozzle['type'] == 'C-D'
-    
-    return {
-        'nozzle_type': nozzle_type,
-        'nozzle_category': nozzle['type'],  # Added: C-D, Bell, Aerospike, etc.
-        'is_cd_nozzle': is_cd_nozzle,  # Boolean for C-D type
-        'divergence_efficiency': nozzle['divergence_efficiency'] * 100,
-        'length_factor': nozzle['length_factor'],
-        'manufacturing_cost': nozzle['manufacturing_cost'],
-        'application': nozzle['application'],
-        'cooling_complexity': nozzle['cooling_complexity'],
-        'description': nozzle['description']
-    }
+        def analyze_nozzle_performance(self):
+        """Analyze nozzle type performance with C-D classification"""
+        nozzle_type = self.params.get('nozzle_type', 'C-D (Converging-Diverging)')
+        nozzle = self.nozzles.NOZZLE_TYPES[nozzle_type]
+        
+        # Determine if it's a C-D nozzle
+        is_cd_nozzle = nozzle.get('type', '') == 'C-D'
+        
+        return {
+            'nozzle_type': nozzle_type,
+            'nozzle_category': nozzle.get('type', 'Standard'),
+            'is_cd_nozzle': is_cd_nozzle,
+            'divergence_efficiency': nozzle['divergence_efficiency'] * 100,
+            'length_factor': nozzle['length_factor'],
+            'manufacturing_cost': nozzle['manufacturing_cost'],
+            'application': nozzle['application'],
+            'cooling_complexity': nozzle['cooling_complexity'],
+            'description': nozzle.get('description', 'Standard nozzle design')
+        }
     
     def analyze_propellant_type(self):
         """Analyze propellant-specific characteristics"""
