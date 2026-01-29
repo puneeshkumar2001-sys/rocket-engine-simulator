@@ -1420,83 +1420,196 @@ class Visualization3D:
 
         # ========== 3D VISUALIZATION ENGINE ==========
 class Visualization3D:
-    """Create 3D visualizations of engine and plume"""
-
+    """Create 3D visualizations of engine and plume with surfaces"""
+    
     @staticmethod
     def create_simple_engine_visualization(Dc, Lc, Dt, De, Ln):
-        """ULTRA-SIMPLE 3D visualization that always works"""
+        """Advanced 3D surface visualization with proper numpy broadcasting"""
         import plotly.graph_objects as go
+        import numpy as np
         
+        # Ensure valid dimensions
+        Dc = float(max(0.1, Dc))
+        Lc = float(max(0.1, Lc))
+        Dt = float(max(0.05, Dt))
+        De = float(max(0.1, De))
+        Ln = float(max(0.1, Ln))
+        
+        # Scale for better visualization
+        scale = 1.0
+        if max(Dc, De) > 2.0:
+            scale = 2.0 / max(Dc, De)
+            Dc *= scale
+            Lc *= scale
+            Dt *= scale
+            De *= scale
+            Ln *= scale
+        
+        # Create figure
         fig = go.Figure()
         
-        # Just show a 3D wireframe of key points
-        # Chamber points
-        chamber_points = {
-            'x': [0, Dc/2, Dc/2, 0, -Dc/2, -Dc/2, 0],
-            'y': [0, 0, Lc, Lc, Lc, 0, 0],
-            'z': [0, 0, 0, 0, 0, 0, 0]
-        }
+        # ========== 1. COMBUSTION CHAMBER (CYLINDER) ==========
+        n_points = 30
+        theta = np.linspace(0, 2 * np.pi, n_points)
+        z_chamber = np.linspace(0, Lc, n_points)
         
-        # Nozzle points
-        nozzle_points = {
-            'x': [Dt/2, De/2, -De/2, -Dt/2, Dt/2],
-            'y': [Lc, Lc+Ln, Lc+Ln, Lc, Lc],
-            'z': [0, 0, 0, 0, 0]
-        }
+        # Create meshgrid PROPERLY
+        theta_grid, z_grid = np.meshgrid(theta, z_chamber)
         
-        # Plume points
-        plume_points = {
-            'x': [De/2, De, -De, -De/2, De/2],
-            'y': [Lc+Ln, Lc+Ln*2, Lc+Ln*2, Lc+Ln, Lc+Ln],
-            'z': [0, 0, 0, 0, 0]
-        }
+        # Chamber surface coordinates
+        x_chamber = (Dc / 2) * np.cos(theta_grid)
+        y_chamber = z_grid  # Use z_grid directly (not transposed)
+        z_chamber_coords = (Dc / 2) * np.sin(theta_grid)
         
-        # Add traces
-        fig.add_trace(go.Scatter3d(
-            x=chamber_points['x'],
-            y=chamber_points['y'],
-            z=chamber_points['z'],
-            mode='lines+markers',
-            line=dict(width=8, color='red'),
-            marker=dict(size=10, color='darkred'),
-            name='Chamber'
+        # Add chamber surface
+        fig.add_trace(go.Surface(
+            x=x_chamber,
+            y=y_chamber,
+            z=z_chamber_coords,
+            colorscale='Reds',
+            showscale=False,
+            opacity=0.9,
+            name='Combustion Chamber',
+            contours={
+                "z": {"show": True, "usecolormap": True}
+            }
         ))
         
-        fig.add_trace(go.Scatter3d(
-            x=nozzle_points['x'],
-            y=nozzle_points['y'],
-            z=nozzle_points['z'],
-            mode='lines+markers',
-            line=dict(width=6, color='blue'),
-            marker=dict(size=8, color='darkblue'),
-            name='Nozzle'
+        # ========== 2. NOZZLE (BELL-SHAPED) ==========
+        z_nozzle = np.linspace(0, Ln, n_points)
+        z_norm = z_nozzle / Ln
+        
+        # Nozzle radius profile (bell shape)
+        # r = throat + (exit - throat) * (1 - cos(pi*z/2Ln)) / 2
+        r_nozzle = Dt/2 + (De/2 - Dt/2) * (1 - np.cos(np.pi * z_norm / 2))
+        
+        # Create nozzle meshgrid
+        theta_nozzle_grid, z_nozzle_grid = np.meshgrid(theta, z_nozzle)
+        
+        # Nozzle surface coordinates
+        x_nozzle = np.outer(r_nozzle, np.cos(theta))  # Correct shape: (n_points, n_points)
+        y_nozzle = z_nozzle_grid + Lc  # Offset by chamber length
+        z_nozzle_coords = np.outer(r_nozzle, np.sin(theta))  # Correct shape
+        
+        # Add nozzle surface
+        fig.add_trace(go.Surface(
+            x=x_nozzle,
+            y=y_nozzle,
+            z=z_nozzle_coords,
+            colorscale='Blues',
+            showscale=False,
+            opacity=0.8,
+            name='Nozzle',
+            contours={
+                "z": {"show": True, "usecolormap": True}
+            }
         ))
         
-        fig.add_trace(go.Scatter3d(
-            x=plume_points['x'],
-            y=plume_points['y'],
-            z=plume_points['z'],
-            mode='lines+markers',
-            line=dict(width=4, color='orange'),
-            marker=dict(size=6, color='darkorange'),
-            name='Plume'
-        ))
+        # ========== 3. EXHAUST PLUME ==========
+        plume_length = Ln * 3
+        z_plume = np.linspace(0, plume_length, 20)
+        z_plume_norm = z_plume / plume_length
         
-        fig.update_layout(
-            title='3D Rocket Engine Outline',
-            scene=dict(
-                xaxis_title='Diameter (m)',
-                yaxis_title='Length (m)',
-                zaxis_title='Height (m)',
-                camera=dict(
-                    eye=dict(x=1.5, y=1.2, z=1.0)
-                )
+        # Plume expansion (parabolic)
+        r_plume_base = De / 2
+        r_plume = r_plume_base * (1 + 0.8 * z_plume_norm**0.7)
+        
+        # Create plume meshgrid
+        theta_plume = np.linspace(0, 2 * np.pi, 40)
+        theta_plume_grid, z_plume_grid = np.meshgrid(theta_plume, z_plume)
+        
+        # Plume surface coordinates (using outer product for correct shape)
+        r_plume_2d = np.tile(r_plume, (len(theta_plume), 1)).T  # Shape: (20, 40)
+        x_plume = r_plume_2d * np.cos(theta_plume_grid)
+        y_plume = z_plume_grid + Lc + Ln  # Offset by chamber + nozzle
+        z_plume_coords = r_plume_2d * np.sin(theta_plume_grid)
+        
+        # Temperature gradient for plume coloring
+        plume_temp = 3500 * np.exp(-z_plume_norm[:, np.newaxis] * 3)  # Shape: (20, 1)
+        plume_temp_2d = np.tile(plume_temp, (1, len(theta_plume)))  # Shape: (20, 40)
+        
+        # Add plume surface
+        fig.add_trace(go.Surface(
+            x=x_plume,
+            y=y_plume,
+            z=z_plume_coords,
+            surfacecolor=plume_temp_2d,
+            colorscale='Hot',
+            colorbar=dict(
+                title="Temperature (K)",
+                thickness=20,
+                len=0.5,
+                x=1.02
             ),
-            height=500
+            opacity=0.7,
+            name='Exhaust Plume',
+            showscale=True,
+            contours={
+                "y": {"show": True, "usecolormap": True, "highlightcolor": "white"}
+            }
+        ))
+        
+        # ========== 4. THROAT HIGHLIGHT ==========
+        # Add throat ring
+        throat_theta = np.linspace(0, 2 * np.pi, 50)
+        x_throat = (Dt / 2) * np.cos(throat_theta)
+        y_throat = Lc * np.ones_like(throat_theta)
+        z_throat = (Dt / 2) * np.sin(throat_theta)
+        
+        fig.add_trace(go.Scatter3d(
+            x=x_throat,
+            y=y_throat,
+            z=z_throat,
+            mode='lines',
+            line=dict(width=8, color='yellow'),
+            name='Throat',
+            showlegend=True
+        ))
+        
+        # ========== 5. UPDATE LAYOUT ==========
+        fig.update_layout(
+            title=dict(
+                text='3D Rocket Engine with Surface Visualization',
+                font=dict(size=20, color='white')
+            ),
+            scene=dict(
+                xaxis=dict(
+                    title='X (m)',
+                    backgroundcolor='rgb(20, 20, 40)',
+                    gridcolor='rgb(100, 100, 100)',
+                    showbackground=True
+                ),
+                yaxis=dict(
+                    title='Length (m)',
+                    backgroundcolor='rgb(20, 20, 40)',
+                    gridcolor='rgb(100, 100, 100)',
+                    showbackground=True
+                ),
+                zaxis=dict(
+                    title='Z (m)',
+                    backgroundcolor='rgb(20, 20, 40)',
+                    gridcolor='rgb(100, 100, 100)',
+                    showbackground=True
+                ),
+                camera=dict(
+                    eye=dict(x=1.8, y=0.8, z=1.2),
+                    up=dict(x=0, y=0, z=1),
+                    center=dict(x=0, y=0, z=0)
+                ),
+                aspectmode='data'
+            ),
+            height=700,
+            paper_bgcolor='rgb(20, 20, 40)',
+            font=dict(color='white'),
+            legend=dict(
+                x=0.02,
+                y=0.98,
+                bgcolor='rgba(0,0,0,0.5)',
+                bordercolor='white'
+            )
         )
         
         return fig
-
 
 # ========== COMPREHENSIVE PDF REPORT GENERATOR ==========
 class ComprehensivePDFReport:
@@ -2234,8 +2347,7 @@ with tab6:
             st.metric("Cooling Complexity", nozzle_info['cooling_complexity'])
         with cols[2]:
             st.metric("Length Factor", f"{nozzle_info['length_factor']:.1f}x")
-            st.metric("Weight Factor", f"{nozzle_info['nozzles'].NOZZLE_TYPES[nozzle_info['nozzle_type']]['weight_factor']:.1f}x")
-        
+            st.metric("Weight Factor", f"{nozzle_info.get('weight_factor', 1.0):.1f}x")
         # Nozzle description
         st.write(f"**Description:** {nozzle_info['description']}")
         st.write(f"**Application:** {nozzle_info['application']}")
@@ -2368,110 +2480,79 @@ with tab8:
                 st.markdown(f"• {note}")
 
 with tab9:
-    st.header("🔥 3D Rocket Engine Visualization")
-    st.markdown("Interactive 3D model with real-time engine dimensions")
+    st.header("🔥 Advanced 3D Engine Visualization")
+    st.markdown("Interactive surface model with temperature gradients")
     
     if 'engine' in st.session_state:
         engine = st.session_state.engine
         
-        # Display engine info
-        col1, col2 = st.columns([2, 1])
+        col_viz, col_info = st.columns([3, 1])
         
-        with col1:
-            st.subheader("🎨 3D Engine Model")
-            
-            # DEBUG: Check dimensions
-            st.write(f"DEBUG: Dc={engine.Dc}, Lc={engine.Lc}, Dt={engine.Dt}, De={engine.De}, Ln={engine.Ln}")
-            
-            # Try the 3D visualization
-            try:
-                # FIRST: Try the simple visualization (most reliable)
-                st.info("Generating 3D visualization...")
-                
-                fig_3d = Visualization3D.create_simple_engine_visualization(
-                    Dc=engine.Dc,
-                    Lc=engine.Lc, 
-                    Dt=engine.Dt,
-                    De=engine.De,
-                    Ln=engine.Ln
-                )
-                
-                st.plotly_chart(fig_3d, use_container_width=True)
-                st.success("✅ 3D Visualization Loaded Successfully!")
-                
-            except Exception as e:
-                st.error(f"❌ Error in 3D visualization: {str(e)}")
-                
-                # FALLBACK: Create a super simple 3D plot that always works
-                st.warning("Using simplified 3D view...")
-                
-                import plotly.graph_objects as go
-                
-                # Create a simple 3D scatter plot
-                x = [0, engine.Dc/2, engine.Dt/2, engine.De/2, engine.De/2]
-                y = [0, 0, engine.Lc, engine.Lc + engine.Ln, engine.Lc + engine.Ln*2]
-                z = [0, 0, 0, 0, 0]
-                
-                fig_fallback = go.Figure(data=[
-                    go.Scatter3d(
-                        x=x, y=y, z=z,
-                        mode='lines+markers',
-                        line=dict(width=6, color='red'),
-                        marker=dict(size=10, color='blue')
-                    )
-                ])
-                
-                fig_fallback.update_layout(
-                    title='Engine Profile (Fallback View)',
-                    scene=dict(
-                        xaxis_title='Diameter (m)',
-                        yaxis_title='Length (m)', 
-                        zaxis_title='Height (m)'
-                    ),
-                    height=500
-                )
-                
-                st.plotly_chart(fig_fallback, use_container_width=True)
+        with col_viz:
+            with st.spinner("Generating advanced 3D surface visualization..."):
+                try:
+                    # Get engine dimensions
+                    Dc = float(engine.Dc)
+                    Lc = float(engine.Lc)
+                    Dt = float(engine.Dt)
+                    De = float(engine.De)
+                    Ln = float(engine.Ln)
+                    
+                    # Debug info
+                    with st.expander("Debug Info", expanded=False):
+                        st.write(f"Chamber: D={Dc:.3f}m, L={Lc:.3f}m")
+                        st.write(f"Nozzle: Throat={Dt:.3f}m, Exit={De:.3f}m, L={Ln:.3f}m")
+                        st.write(f"Expansion Ratio: {engine.params['expansion_ratio']:.1f}")
+                    
+                    # Create 3D visualization
+                    fig = Visualization3D.create_simple_engine_visualization(Dc, Lc, Dt, De, Ln)
+                    st.plotly_chart(fig, use_container_width=True)
+                    st.success("✅ Advanced 3D Surface Visualization Loaded")
+                    
+                except Exception as e:
+                    st.error(f"❌ 3D Visualization Error: {str(e)}")
+                    st.info("Using fallback visualization...")
+                    
+                    # Fallback: Simple 3D line plot
+                    import plotly.graph_objects as go
+                    fig_fallback = go.Figure(data=[
+                        go.Scatter3d(
+                            x=[0, engine.Dc/2, engine.Dt/2, engine.De/2],
+                            y=[0, 0, engine.Lc, engine.Lc + engine.Ln],
+                            z=[0, 0, 0, 0],
+                            mode='lines+markers',
+                            line=dict(width=6, color='red'),
+                            marker=dict(size=10, color='blue')
+                        )
+                    ])
+                    fig_fallback.update_layout(title='Simple Engine Profile')
+                    st.plotly_chart(fig_fallback, use_container_width=True)
         
-        with col2:
-            st.subheader("📐 Engine Dimensions")
-            
-            # Display metrics
-            st.metric("Chamber Diameter", f"{engine.Dc:.3f} m")
-            st.metric("Chamber Length", f"{engine.Lc:.3f} m")
-            st.metric("Throat Diameter", f"{engine.Dt:.3f} m")
-            st.metric("Exit Diameter", f"{engine.De:.3f} m")
-            st.metric("Nozzle Length", f"{engine.Ln:.3f} m")
-            
-            # Plume info
-            st.subheader("🔥 Exhaust Plume")
-            plume_length = engine.Ln * 2.5
-            st.metric("Plume Length", f"{plume_length:.1f} m")
-            st.metric("Expansion Ratio", f"{engine.params['expansion_ratio']:.0f}")
-            
-            # 3D Controls
+        with col_info:
             st.subheader("🎮 3D Controls")
-            if st.button("🔄 Refresh View", use_container_width=True):
-                st.rerun()
-                
-            view_mode = st.selectbox(
-                "View Mode",
-                ["Full Engine", "Chamber Only", "Nozzle Only", "Plume Only"]
-            )
             
-            show_grid = st.checkbox("Show Grid", True)
-            show_axes = st.checkbox("Show Axes", True)
-    
+            # Camera controls
+            camera_x = st.slider("Camera X", -3.0, 3.0, 1.8, 0.1)
+            camera_y = st.slider("Camera Y", -3.0, 3.0, 0.8, 0.1)
+            camera_z = st.slider("Camera Z", -3.0, 3.0, 1.2, 0.1)
+            
+            # Opacity controls
+            chamber_opacity = st.slider("Chamber Opacity", 0.1, 1.0, 0.9, 0.1)
+            nozzle_opacity = st.slider("Nozzle Opacity", 0.1, 1.0, 0.8, 0.1)
+            plume_opacity = st.slider("Plume Opacity", 0.1, 1.0, 0.7, 0.1)
+            
+            if st.button("🔄 Apply Camera Settings"):
+                st.rerun()
+            
+            st.subheader("📐 Dimensions")
+            st.metric("Chamber", f"Ø{Dc:.3f}m × {Lc:.3f}m")
+            st.metric("Nozzle", f"Ø{Dt:.3f}m → Ø{De:.3f}m")
+            st.metric("Length", f"{Ln:.3f}m")
+            
     else:
-        # No engine simulation yet
-        st.warning("⚠️ No engine simulation found!")
-        st.info("""
-        To see 3D visualization:
-        1. Go to the sidebar
-        2. Set your engine parameters  
-        3. Click '🔄 UPDATE SIMULATION'
-        4. Return to this tab
-        """)
+        st.warning("No engine simulation found. Run a simulation first!")
+        st.image("https://i.imgur.com/4zqR3eG.png", 
+                 caption="Advanced 3D Surface Visualization Preview")
         
         # Show example image
         st.image(
