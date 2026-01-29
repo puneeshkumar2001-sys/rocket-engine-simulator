@@ -1429,7 +1429,7 @@ class Visualization3D:
 
         return fig
 
-     class Visualization3D:
+class Visualization3D:
     @staticmethod
     def create_simple_engine_visualization(Dc, Lc, Dt, De, Ln):
         """Very simple 3D that always works"""
