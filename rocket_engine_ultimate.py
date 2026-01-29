@@ -1429,71 +1429,26 @@ class Visualization3D:
 
         return fig
 
-      # ========== 3D VISUALIZATION ENGINE ==========
-class Visualization3D:
-    """Create 3D visualizations of engine and plume"""
-    
+     class Visualization3D:
     @staticmethod
     def create_simple_engine_visualization(Dc, Lc, Dt, De, Ln):
-        """SIMPLE 3D visualization that ALWAYS works"""
+        """Very simple 3D that always works"""
         import plotly.graph_objects as go
         
-        # Create figure
-        fig = go.Figure()
+        # Just make a simple 3D cube (always works)
+        fig = go.Figure(data=[
+            go.Scatter3d(
+                x=[0, 1, 1, 0, 0, 1, 1, 0],  # Cube corners X
+                y=[0, 0, 1, 1, 0, 0, 1, 1],  # Cube corners Y  
+                z=[0, 0, 0, 0, 1, 1, 1, 1],  # Cube corners Z
+                mode='markers+lines',
+                marker=dict(size=10, color='red'),
+                line=dict(width=2, color='blue'),
+                name='Test Cube'
+            )
+        ])
         
-        # 1. Chamber (simple rectangle)
-        chamber_x = [0, Dc/2, Dc/2, 0, 0]
-        chamber_y = [0, 0, Lc, Lc, 0]
-        chamber_z = [0, 0, 0, 0, 0]
-        
-        fig.add_trace(go.Scatter3d(
-            x=chamber_x,
-            y=chamber_y, 
-            z=chamber_z,
-            mode='lines',
-            line=dict(width=6, color='red'),
-            name='Chamber'
-        ))
-        
-        # 2. Nozzle (trapezoid)
-        nozzle_x = [Dt/2, De/2, -De/2, -Dt/2, Dt/2]
-        nozzle_y = [Lc, Lc+Ln, Lc+Ln, Lc, Lc]
-        nozzle_z = [0, 0, 0, 0, 0]
-        
-        fig.add_trace(go.Scatter3d(
-            x=nozzle_x,
-            y=nozzle_y,
-            z=nozzle_z,
-            mode='lines',
-            line=dict(width=6, color='blue'),
-            name='Nozzle'
-        ))
-        
-        # 3. Plume (expanding)
-        plume_x = [De/2, De, -De, -De/2, De/2]
-        plume_y = [Lc+Ln, Lc+Ln*2, Lc+Ln*2, Lc+Ln, Lc+Ln]
-        plume_z = [0, 0, 0, 0, 0]
-        
-        fig.add_trace(go.Scatter3d(
-            x=plume_x,
-            y=plume_y,
-            z=plume_z,
-            mode='lines',
-            line=dict(width=4, color='orange'),
-            name='Plume'
-        ))
-        
-        fig.update_layout(
-            title='3D Rocket Engine',
-            scene=dict(
-                xaxis_title='Width (m)',
-                yaxis_title='Length (m)',
-                zaxis_title='Height (m)',
-                camera=dict(eye=dict(x=1.5, y=1.5, z=0.8))
-            ),
-            height=500
-        )
-        
+        fig.update_layout(title='3D Test - If you see this, 3D works')
         return fig
 # ========== COMPREHENSIVE PDF REPORT GENERATOR ==========
 class ComprehensivePDFReport:
@@ -2364,95 +2319,23 @@ with tab8:
                 st.markdown(f"• {note}")
 
 with tab9:
-    st.header("🔥 3D Rocket Engine Visualization")
+    st.header("3D Test")
     
     if 'engine' in st.session_state:
         engine = st.session_state.engine
         
-        # Create 3D visualization
-        try:
-            fig = Visualization3D.create_simple_engine_visualization(
-                Dc=engine.Dc,
-                Lc=engine.Lc,
-                Dt=engine.Dt,
-                De=engine.De,
-                Ln=engine.Ln
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            st.success("✅ 3D Visualization Loaded")
-            
-        except Exception as e:
-            st.error(f"❌ 3D Error: {str(e)}")
-            
-            # Simple fallback
-            import plotly.graph_objects as go
-            fig_fallback = go.Figure(data=[
-                go.Scatter3d(
-                    x=[0, engine.Dc/2, engine.Dt/2, engine.De/2],
-                    y=[0, 0, engine.Lc, engine.Lc + engine.Ln],
-                    z=[0, 0, 0, 0],
-                    mode='lines+markers',
-                    line=dict(width=6, color='red'),
-                    marker=dict(size=10, color='blue')
-                )
-            ])
-            fig_fallback.update_layout(title='Simple Engine Profile')
-            st.plotly_chart(fig_fallback, use_container_width=True)
+        # Show if engine exists
+        st.success("✅ Engine exists in memory")
+        st.write(f"Engine has thrust: {engine.params.get('thrust', 'Unknown')}N")
         
-        # Show engine info
-        st.subheader("📐 Engine Dimensions")
-        cols = st.columns(4)
-        with cols[0]:
-            st.metric("Chamber D", f"{engine.Dc:.3f} m")
-        with cols[1]:
-            st.metric("Throat D", f"{engine.Dt:.3f} m")
-        with cols[2]:
-            st.metric("Exit D", f"{engine.De:.3f} m")
-        with cols[3]:
-            st.metric("Nozzle L", f"{engine.Ln:.3f} m")
+        # Show 3D
+        fig = Visualization3D.create_simple_engine_visualization(1, 1, 1, 1, 1)
+        st.plotly_chart(fig, use_container_width=True)
         
-        # 2D Nozzle Profile
-        st.markdown("---")
-        st.subheader("📈 Nozzle Profile (2D)")
-        
-        import plotly.graph_objects as go
-        import numpy as np
-        
-        z = np.linspace(0, engine.Ln, 100)
-        r = engine.Dt/2 + (engine.De/2 - engine.Dt/2) * (z/engine.Ln)**2
-        
-        fig_2d = go.Figure()
-        fig_2d.add_trace(go.Scatter(
-            x=z, y=r, fill='tozeroy',
-            line=dict(color='blue', width=3),
-            name='Nozzle Wall'
-        ))
-        fig_2d.add_trace(go.Scatter(
-            x=z, y=-r, fill='tonexty',
-            line=dict(color='blue', width=3),
-            name='Lower Wall'
-        ))
-        
-        fig_2d.update_layout(
-            title='Nozzle Contour',
-            xaxis_title='Length from Throat (m)',
-            yaxis_title='Radius (m)',
-            height=300
-        )
-        
-        st.plotly_chart(fig_2d, use_container_width=True)
+        st.success("✅ If you see a red/blue cube above, 3D WORKS!")
     
     else:
-        # When no engine exists
-        st.warning("⚠️ No engine simulation found!")
-        st.info("""
-        **To see 3D visualization:**
-        1. Go to the sidebar
-        2. Set engine parameters  
-        3. Click '🔄 UPDATE SIMULATION'
-        4. Return to this tab
-        """)
-
+        st.error("❌ NO ENGINE - Click 'UPDATE SIMULATION' in sidebar first")
 # ========== FINAL SUMMARY ==========
 st.markdown("---")
 st.subheader("🎯 COMPREHENSIVE ENGINEERING ASSESSMENT")
