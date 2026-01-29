@@ -1817,6 +1817,7 @@ class UltimateRocketEngine:
     
         def analyze_nozzle_performance(self):
         """Analyze nozzle type performance with C-D classification"""
+        print("DEBUG: analyze_nozzle_performance called")
         nozzle_type = self.params.get('nozzle_type', 'C-D (Converging-Diverging)')
         nozzle = self.nozzles.NOZZLE_TYPES[nozzle_type]
         
