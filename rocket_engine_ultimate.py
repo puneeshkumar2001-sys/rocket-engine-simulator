@@ -1418,7 +1418,11 @@ class Visualization3D:
 
         return fig
 
-        @staticmethod
+        # ========== 3D VISUALIZATION ENGINE ==========
+class Visualization3D:
+    """Create 3D visualizations of engine and plume"""
+
+    @staticmethod
     def create_simple_engine_visualization(Dc, Lc, Dt, De, Ln):
         """ULTRA-SIMPLE 3D visualization that always works"""
         import plotly.graph_objects as go
