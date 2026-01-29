@@ -2310,10 +2310,11 @@ elif overall_eff > 85:
 else:
     st.error(f"## ❌ NEEDS IMPROVEMENT - Overall Efficiency: {overall_eff:.1f}%")
 
-# Main Tabs - UPDATED TO 8 TABS
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 , tab9 = st.tabs([
+# Main Tabs - UPDATED TO 10 TABS
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
     "📊 Performance", "🔥 Thermal", "🏗️ Structural", "🎵 Acoustic", 
-    "🔄 Engine Cycle", "🚀 Nozzle Design", "🧪 Propellant", "🔍 Differences", "🎨 3D Visualization"
+    "🔄 Engine Cycle", "🚀 Nozzle Design", "🧪 Propellant", "🔍 Differences", 
+    "🎨 3D Visualization", "🤖 AI/ML Predictions"  # <-- tab10 is this one
 ])
 
 with tab1:
